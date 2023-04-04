@@ -1,4 +1,4 @@
-namespace Bookstore.Models;
+namespace Bookstore.Books.Models;
 
 public class Person
 {
