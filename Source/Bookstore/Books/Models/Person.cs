@@ -2,7 +2,7 @@ namespace Bookstore.Books.Models;
 
 public class Person
 {
-    public int Id { get; private set; } = 0;
+    public Guid Id { get; private set; } = Guid.Empty;
     public string FirstName { get; private set; } = string.Empty;
     public string LastName { get; private set; } = string.Empty;
 
@@ -16,6 +16,7 @@ public class Person
 
     public static Person CreateNew(string firstName) => new()
     {
-        FirstName = firstName
+        FirstName = firstName,
+        Id = Guid.NewGuid()
     };
 }

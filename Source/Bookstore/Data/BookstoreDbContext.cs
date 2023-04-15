@@ -16,6 +16,11 @@ public class BookstoreDbContext : DbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("Books");
+
+        modelBuilder.Entity<Person>()
+            .Property(person => person.Id)
+            .ValueGeneratedOnAdd();
+
         modelBuilder.Entity<BookAuthor>()
             .HasKey(new[] { "BookId", "PersonId" });
 
@@ -27,6 +32,10 @@ public class BookstoreDbContext : DbContext
         modelBuilder.Entity<BookAuthor>()
             .HasOne(bookAuthor => bookAuthor.Person)
             .WithMany();
+
+        modelBuilder.Entity<Book>()
+            .Property(book => book.Id)
+            .ValueGeneratedOnAdd();
 
         modelBuilder.Entity<Book>()
             .Ignore(book => book.Authors);

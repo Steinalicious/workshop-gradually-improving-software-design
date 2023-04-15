@@ -2,7 +2,7 @@ namespace Bookstore.Books.Models;
 
 public class Book
 {
-    public int Id { get; private set; } = 0;
+    public Guid Id { get; private set; } = Guid.Empty;
     public string Title { get; private set; } = string.Empty;
     private ICollection<BookAuthor> AuthorsCollection { get; set; } = new List<BookAuthor>();
     public IEnumerable<Person> Authors => AuthorsCollection.Select(author => author.Person);
@@ -11,7 +11,11 @@ public class Book
 
     public static Book CreateNew(string title, params Person[] authors)
     {
-        Book book = new() { Title = title };
+        Book book = new()
+        {
+            Title = title,
+            Id = Guid.NewGuid()
+        };
         book.AuthorsCollection = BookAuthor.CreateMany(book, authors).ToList();
         return book;
     }
