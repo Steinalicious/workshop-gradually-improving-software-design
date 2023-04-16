@@ -4,7 +4,7 @@ public class Book
 {
     public Guid Id { get; private set; } = Guid.Empty;
     public string Title { get; private set; } = string.Empty;
-    private ICollection<BookAuthor> AuthorsCollection { get; set; } = new List<BookAuthor>();
+    internal ICollection<BookAuthor> AuthorsCollection { get; set; } = new List<BookAuthor>();
     public IEnumerable<Person> Authors => AuthorsCollection.Select(author => author.Person);
 
     private Book() { }  // Used by EF Core

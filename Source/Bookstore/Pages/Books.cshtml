@@ -1,5 +1,5 @@
 ﻿@page
-@model IndexModel
+@model BooksModel
 @{
     ViewData["Title"] = "Home page";
 }
@@ -8,8 +8,17 @@
     <table class="table table-striped">
         <thead>
             <th scope="col">#</th>
-            <th scope="col">Author(s)</th>
-            <th scope="col">Title</th>
+            <th scope="col" style="text-align: left">Author(s)</th>
+            <th scope="col" style="text-align: left">Title</th>
         </thead>
+        <tbody>
+            @foreach (var (book, ordinal) in Model.Books.Select((book, index) => (book, index + 1)))
+            {
+                <tr>
+                    <td>@ordinal</td>
+                    <td style="text-align: left">@string.Join(", ", book.Authors.Select(person => $"{person.FirstName} {person.LastName}"))</td>
+                    <td style="text-align: left">@book.Title</td>
+                </tr>
+            }
     </table>
 </div>
