@@ -1,0 +1,34 @@
+﻿@page "/books/{id}"
+@model BookDetailsModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <table class="table table-striped">
+        <thead>
+            <th scope="col" colspan="2" style="text-align: left">@Model.Book.Title</th>
+        </thead>
+        <tbody>
+            @{ 
+                string[] authors = Model.Book.Authors
+                    .Select(a => string.IsNullOrEmpty(a.LastName) ? a.FirstName : $"{a.FirstName} {a.LastName}")
+                    .ToArray();
+                string authorsLabel = authors.Length > 1 ? "Authors" : "Author";
+            }
+            @if (authors.Length > 0)
+            {
+                <tr>
+                    <th scope="col" rowspan="@authors.Length" style="text-align: right">@authorsLabel</th>
+                    <td style="text-align: left">@authors[0]</td>
+                </tr>
+            }
+            @foreach (var author in authors.Skip(1))
+            {
+                <tr>
+                    <td style="text-align: left">@author</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

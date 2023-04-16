@@ -10,6 +10,7 @@
             <th scope="col">#</th>
             <th scope="col" style="text-align: left">Author(s)</th>
             <th scope="col" style="text-align: left">Title</th>
+            <th></th>
         </thead>
         <tbody>
             @foreach (var (book, ordinal) in Model.Books.Select((book, index) => (book, index + 1)))
@@ -18,6 +19,7 @@
                     <td>@ordinal</td>
                     <td style="text-align: left">@string.Join(", ", book.Authors.Select(person => $"{person.FirstName} {person.LastName}"))</td>
                     <td style="text-align: left">@book.Title</td>
+                    <td><a class="btn btn-primary" href="/books/@book.Id">View</a></td>
                 </tr>
             }
     </table>
