@@ -9,4 +9,7 @@ public static class BookSpecifications
         books
             .Include(book => book.AuthorsCollection)
             .ThenInclude(bookAuthor => bookAuthor.Person);
+
+    public static IQueryable<Book> ByTitle(this IQueryable<Book> books, string title) =>
+        books.Where(book => book.Title == title);
 }
