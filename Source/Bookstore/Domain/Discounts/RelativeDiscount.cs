@@ -6,4 +6,6 @@ public class RelativeDiscount
 
     public RelativeDiscount(decimal multiplyingFactor) =>
         MultiplyingFactor = multiplyingFactor >= 0 ? multiplyingFactor : throw new ArgumentOutOfRangeException(nameof(multiplyingFactor));
+
+    public override string ToString() => $"Relative discount: {MultiplyingFactor * 100:0.00}%";
 }
