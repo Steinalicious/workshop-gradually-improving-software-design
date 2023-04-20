@@ -16,7 +16,7 @@ public class BooksSeed : IDataSeed<Book>
 
     public async Task SeedAsync()
     {
-        if (_dbContext.Books.Any()) await  Task.CompletedTask;
+        if (_dbContext.Books.Any()) return;
 
         foreach ((string title, (string firstName, string lastName)[] authors) bookData in BooksData)
         {
