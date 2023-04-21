@@ -7,5 +7,8 @@ public record struct Money(decimal Amount, Currency Currency)
 
 public record struct Currency(string Symbol)
 {
+    public static Currency USD { get; } = new("USD");
+    public static Currency EUR { get; } = new("EUR");
+
     public override string ToString() => Symbol;
 }
