@@ -13,7 +13,7 @@ public class BookstoreDbContext : DbContext
     public DbSet<Book> Books => base.Set<Book>();
     public DbSet<BookAuthor> BookAuthors => base.Set<BookAuthor>();
 
-    private DbSet<BookPrice> BookPrices => base.Set<BookPrice>();
+    public DbSet<BookPrice> BookPrices => base.Set<BookPrice>();
 
     public IQueryable<BookPrice> GetBookPricesAt(DateTime time) => this.BookPrices
         .Where(price => price.ValidFrom <= time)

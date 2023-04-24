@@ -25,7 +25,7 @@ public class BookDetailsModel : PageModel
         if ((await _dbContext.Books.GetBooks().ById(id)) is Book book)
         {
             this.Book = book;
-            this.Price = (await _dbContext.GetBookPricesAt(DateTime.Now).ToListAsync()).FirstOrDefault(price => price.BookId == book.Id)?.Price;
+            this.Price = (await _dbContext.BookPrices.For(book).At(DateTime.Now).FirstOrDefaultAsync())?.Price;
             return Page();
         }
 

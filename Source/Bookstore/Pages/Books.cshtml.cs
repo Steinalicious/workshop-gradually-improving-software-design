@@ -24,6 +24,6 @@ public class BooksModel : PageModel
     public async Task OnGet()
     {
         await this._booksSeed.SeedAsync();
-        this.Books = await _dbContext.Books.ToListAsync();
+        this.Books = await _dbContext.Books.GetBooks().OrderBy(book => book.Title).ToListAsync();
     }
 }
