@@ -4,8 +4,10 @@ public record struct Money : IComparable<Money>
 {
     public override string ToString() => $"{Amount:0.00} {Currency.Symbol}";
 
-    public decimal Amount { get; private init; }
-    public Currency Currency { get; private init; }
+    public decimal Amount { get; private set; }
+    public Currency Currency { get; private set; }
+
+    public Money() : this(0, Currency.Empty) { }
 
     public Money(decimal amount, Currency currency)
     {
@@ -36,7 +38,8 @@ public record struct Money : IComparable<Money>
     }
 
     public int CompareTo(Money other) =>
-        Currency == other.Currency ? Amount.CompareTo(other.Amount) : throw new InvalidOperationException("Cannot compare money of different currencies");
+        Currency == other.Currency ? Amount.CompareTo(other.Amount)
+        : throw new InvalidOperationException("Cannot compare money of different currencies");
 
     public static Money operator +(Money left, Money right) => left.Add(right);
     public static Money operator -(Money left, Money right) => left.Subtract(right);
@@ -47,6 +50,10 @@ public record struct Money : IComparable<Money>
 public record struct Currency(string Symbol)
 {
     public override string ToString() => Symbol;
+
+    public Currency() : this(string.Empty) { }
+
+    internal static Currency Empty => new(string.Empty);
 
     public static readonly Currency EUR = new("EUR");
     public static readonly Currency USD = new("USD");

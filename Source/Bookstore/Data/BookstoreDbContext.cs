@@ -1,5 +1,7 @@
+using Bookstore.Domain.Common;
 using Bookstore.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 public class BookstoreDbContext : DbContext
 {
@@ -10,6 +12,8 @@ public class BookstoreDbContext : DbContext
 
     public DbSet<Book> Books => base.Set<Book>();
     public DbSet<BookAuthor> BookAuthors => base.Set<BookAuthor>();
+
+    private DbSet<BookPrice> BookPrices => base.Set<BookPrice>();
 
     public DbSet<Person> People => base.Set<Person>();
 
@@ -39,5 +43,21 @@ public class BookstoreDbContext : DbContext
 
         modelBuilder.Entity<Book>()
             .Ignore(book => book.Authors);
+
+        modelBuilder.Entity<BookPrice>().Ignore(bookPrice => bookPrice.Price);
+
+        modelBuilder.Entity<BookPrice>()
+            .Property<decimal>("Amount")
+            .HasColumnName("Amount")
+            .IsRequired()
+            .HasColumnType("decimal(18, 2)");
+
+        modelBuilder.Entity<BookPrice>()
+            .Property<Currency>("Currency")
+            .HasColumnName("Currency")
+            .HasConversion(
+                currency => currency.Symbol,
+                symbol => new Currency(symbol))
+            .IsRequired();
     }
 }
