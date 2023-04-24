@@ -15,6 +15,11 @@ public class BookstoreDbContext : DbContext
 
     private DbSet<BookPrice> BookPrices => base.Set<BookPrice>();
 
+    public IQueryable<BookPrice> GetBookPricesAt(DateTime time) => this.BookPrices
+        .Where(price => price.ValidFrom <= time)
+        .GroupBy(price => price.BookId)
+        .Select(group => group.OrderByDescending(price => price.ValidFrom).First());
+
     public DbSet<Person> People => base.Set<Person>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -43,6 +48,12 @@ public class BookstoreDbContext : DbContext
 
         modelBuilder.Entity<Book>()
             .Ignore(book => book.Authors);
+
+        modelBuilder.Entity<BookPrice>()
+            .HasOne<Book>()
+            .WithMany()
+            .HasForeignKey(price => price.BookId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         modelBuilder.Entity<BookPrice>().Ignore(bookPrice => bookPrice.Price);
 

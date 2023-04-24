@@ -1,4 +1,6 @@
 ﻿@page "/books/{id}"
+@using Bookstore.Domain.Common;
+
 @model BookDetailsModel
 @{
     ViewData["Title"] = "Home page";
@@ -30,5 +32,14 @@
                 </tr>
             }
         </tbody>
+        @if (Model.Price is Money price)
+        {
+            <tfoot>
+                <tr>
+                    <th scope="col" style="text-align: right">Price</th>
+                    <td style="text-align: left">@price</td>
+                </tr>
+            </tfoot>
+        }
     </table>
 </div>
