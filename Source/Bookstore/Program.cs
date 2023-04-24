@@ -18,11 +18,13 @@ if (builder.Environment.IsDevelopment())
 {
     builder.Services.AddScoped<IDataSeed<Person>, AuthorsSeed>();
     builder.Services.AddScoped<IDataSeed<Book>, BooksSeed>();
+    builder.Services.AddScoped<IDataSeed<BookPrice>, BookPricesSeed>();
 }
 else
 {
     builder.Services.AddScoped<IDataSeed<Person>, NoSeed<Person>>();
     builder.Services.AddScoped<IDataSeed<Book>, NoSeed<Book>>();
+    builder.Services.AddScoped<IDataSeed<BookPrice>, NoSeed<BookPrice>>();
 }
 
 var app = builder.Build();
