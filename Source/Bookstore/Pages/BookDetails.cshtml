@@ -31,13 +31,20 @@
                     <td style="text-align: left">@author</td>
                 </tr>
             }
+            @foreach (var priceLine in Model.PriceSpecification.Take(Model.PriceSpecification.Count - 1))
+            {
+                <tr>
+                    <th scope="col" style="text-align: right">@priceLine.Label</th>
+                    <td style="text-align: left">@priceLine.Amount</td>
+                </tr>
+            }
         </tbody>
-        @if (Model.Price is Money price)
+        @if (Model.PriceSpecification.Count > 0)
         {
             <tfoot>
                 <tr>
-                    <th scope="col" style="text-align: right">Price</th>
-                    <td style="text-align: left">@price</td>
+                    <th scope="col" style="text-align: right">@Model.PriceSpecification[^1].Label</th>
+                    <td style="text-align: left">@Model.PriceSpecification[^1].Amount</td>
                 </tr>
             </tfoot>
         }
