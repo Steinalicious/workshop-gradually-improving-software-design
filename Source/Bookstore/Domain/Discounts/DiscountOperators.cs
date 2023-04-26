@@ -1,8 +1,12 @@
+using Bookstore.Domain.Discounts.Implementation;
+
 namespace Bookstore.Domain.Discounts;
 
 public static class DiscountOperators
 {
     public static IDiscount Then(this IDiscount first, IDiscount second) =>
-        first is ChainedDiscounts chain ? chain.Then(second)
-        : ChainedDiscounts.Create(first, second);
+        ChainedDiscounts.Create(first, second);
+
+    public static IDiscount And(this IDiscount first, IDiscount second) =>
+        ParallelDiscounts.Create(first, second);
 }

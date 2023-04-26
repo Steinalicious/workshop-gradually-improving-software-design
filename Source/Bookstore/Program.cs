@@ -15,7 +15,8 @@ string bookstoreConnectionString =
 builder.Services.AddDbContext<BookstoreDbContext>(options =>
     options.UseSqlServer(bookstoreConnectionString));
 
-builder.Services.AddSingleton<IDiscount>(_ => new RelativeDiscount(0.25M).Then(new TitlePrefixDiscount(.22M, "C")));
+builder.Services.AddSingleton<IDiscount>(_ =>
+    (new RelativeDiscount(0.25M).Then(new TitlePrefixDiscount(.20M, "C"))).And(new TitleContentDiscount(.10M, "Code")));
 
 if (builder.Environment.IsDevelopment())
 {

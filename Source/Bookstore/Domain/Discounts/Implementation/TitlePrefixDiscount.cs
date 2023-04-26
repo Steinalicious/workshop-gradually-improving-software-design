@@ -17,5 +17,5 @@ public class TitlePrefixDiscount : SingleDiscount
         (context.book?.Title.StartsWith(this.TitlePrefix, true, CultureInfo.InvariantCulture) ?? false) ? this : new NoDiscount();
 
     public override string ToString() =>
-        $"Title discount {this.Factor:P2} for titles beginning with \"{this.TitlePrefix}\"";
+        $"{this.Factor:P2} if title begins with \"{this.TitlePrefix}\"";
 }

@@ -17,5 +17,5 @@ public class RelativeDiscount : SingleDiscount
     protected override Money GetDiscountAmount(Money price) => price * this.Factor;
 
     public override string ToString() =>
-        $"Relative discount {this.Factor:P2}";
+        $"{this.Factor:P2}";
 }
