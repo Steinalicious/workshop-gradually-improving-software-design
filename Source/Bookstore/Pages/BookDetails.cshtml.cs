@@ -1,7 +1,7 @@
 ﻿using Bookstore.Data.Seeding;
 using Bookstore.Domain.Common;
 using Bookstore.Domain.Models;
-using Bookstore.Domain.Models.Discounts;
+using Bookstore.Domain.Discounts;
 using Bookstore.Domain.Specifications;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -16,7 +16,7 @@ public class BookDetailsModel : PageModel
     private readonly ILogger<IndexModel> _logger;
     private readonly BookstoreDbContext _dbContext;
     private readonly IDataSeed<BookPrice> _bookPricesSeed;
-    private readonly IDiscount _discount;
+    private IDiscount Discount { get; set; }
 
     public Book Book { get; private set; } = null!;
 
@@ -27,7 +27,7 @@ public class BookDetailsModel : PageModel
         _logger = logger;
         _dbContext = dbContext;
         _bookPricesSeed = bookPricesSeed;
-        _discount = discount;
+        Discount = discount;
         _bookPricesSeed = bookPricesSeed2;
     }
 
@@ -36,7 +36,10 @@ public class BookDetailsModel : PageModel
         await _bookPricesSeed.SeedAsync();
         if ((await _dbContext.Books.GetBooks().ById(id)) is Book book)
         {
+            
             this.Book = book;
+            this.Discount = this.Discount.Within(new DiscountContext(book));
+
             Money? originalPrice = (await _dbContext.BookPrices.For(book).At(DateTime.Now).FirstOrDefaultAsync())?.Price;
             this.PriceSpecification = originalPrice.HasValue ? this.CalculatePriceLines(originalPrice.Value) : new List<PriceLine>();
 
@@ -50,8 +53,10 @@ public class BookDetailsModel : PageModel
     {
         List<PriceLine> priceLines = new();
 
+        _logger.LogInformation("Applying discount: {discount}", Discount);
+
         priceLines.Add(new("Original price", originalPrice));
-        priceLines.AddRange(_discount.ApplyTo(originalPrice).Select(a => new PriceLine(a.Label, a.Amount)));
+        priceLines.AddRange(Discount.GetDiscountAmounts(originalPrice).Select(a => new PriceLine(a.Label, a.Amount)));
 
         if (priceLines.Count > 1)
         {

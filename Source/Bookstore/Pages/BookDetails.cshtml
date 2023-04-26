@@ -33,7 +33,7 @@
             }
             @foreach (var priceLine in Model.PriceSpecification.Take(Model.PriceSpecification.Count - 1))
             {
-                <tr>
+                <tr class="table-warning">
                     <th scope="col" style="text-align: right">@priceLine.Label</th>
                     <td style="text-align: left">@priceLine.Amount</td>
                 </tr>
@@ -42,7 +42,7 @@
         @if (Model.PriceSpecification.Count > 0)
         {
             <tfoot>
-                <tr>
+                <tr class="table-primary">
                     <th scope="col" style="text-align: right">@Model.PriceSpecification[^1].Label</th>
                     <td style="text-align: left">@Model.PriceSpecification[^1].Amount</td>
                 </tr>
