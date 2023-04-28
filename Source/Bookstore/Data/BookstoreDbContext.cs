@@ -71,6 +71,10 @@ public class BookstoreDbContext : DbContext
                 symbol => new Currency(symbol))
             .IsRequired();
 
+        modelBuilder.Entity<Invoice>().Property(invoice => invoice.DueDate).HasConversion(
+            dueDate => dueDate.ToDateTime(new TimeOnly(0)),
+            dateTime => DateOnly.FromDateTime(dateTime));
+
         modelBuilder.Entity<InvoiceLine>()
             .ToTable("InvoiceLines")
             .Ignore(line => line.Price);
