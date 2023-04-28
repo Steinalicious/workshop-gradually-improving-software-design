@@ -19,6 +19,9 @@ public class BookstoreDbContext : DbContext
 
     public DbSet<Person> People => base.Set<Person>();
 
+    public DbSet<Invoice> Invoices => base.Set<Invoice>();
+    public DbSet<InvoiceLine> InvoiceItems => base.Set<InvoiceLine>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("Books");
@@ -67,5 +70,26 @@ public class BookstoreDbContext : DbContext
                 currency => currency.Symbol,
                 symbol => new Currency(symbol))
             .IsRequired();
+
+        modelBuilder.Entity<InvoiceLine>()
+            .ToTable("InvoiceLines")
+            .Ignore(line => line.Price);
+
+        modelBuilder.Entity<InvoiceLine>()
+            .Property<decimal>("Amount")
+            .HasColumnName("Amount")
+            .IsRequired()
+            .HasColumnType("decimal(18, 2)");
+
+        modelBuilder.Entity<InvoiceLine>()
+            .Property<Currency>("Currency")
+            .HasColumnName("Currency")
+            .HasConversion(
+                currency => currency.Symbol,
+                symbol => new Currency(symbol))
+            .IsRequired();
+
+        modelBuilder.Entity<BookLine>()
+            .HasBaseType<InvoiceLine>();
     }
 }

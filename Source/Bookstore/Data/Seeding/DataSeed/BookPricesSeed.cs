@@ -26,6 +26,8 @@ public class BookPricesSeed : IDataSeed<BookPrice>
 
     public async Task SeedAsync()
     {
+        if (await _dbContext.BookPrices.AnyAsync()) return;
+
         IEnumerable<Book> books = await _dbContext.Books.ToListAsync();
         foreach (Book book in books)
         {

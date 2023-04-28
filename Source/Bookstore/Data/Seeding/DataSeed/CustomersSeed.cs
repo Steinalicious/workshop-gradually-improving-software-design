@@ -1,4 +1,5 @@
 using Bookstore.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Data.Seeding.DataSeed;
 
@@ -19,6 +20,8 @@ public class CustomersSeed : IDataSeed<Customer>
 
     public async Task SeedAsync()
     {
+        if (await _dbContext.Customers.AnyAsync()) return;
+
         foreach (Customer customer in DemoCustomers)
         {
             await EnsureEqualExists(customer);

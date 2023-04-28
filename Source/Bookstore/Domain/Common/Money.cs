@@ -7,6 +7,8 @@ public record struct Money : IComparable<Money>
     public decimal Amount { get; private set; }
     public Currency Currency { get; private set; }
 
+    public static Money Zero => new(0, Currency.Empty);
+
     public Money() : this(0, Currency.Empty) { }
 
     public Money(decimal amount, Currency currency)
@@ -45,18 +47,4 @@ public record struct Money : IComparable<Money>
     public static Money operator -(Money left, Money right) => left.Subtract(right);
     public static Money operator *(Money left, decimal right) => left.Scale(right);
     public static Money operator *(decimal left, Money right) => right.Scale(left);
-}
-
-public record struct Currency(string Symbol)
-{
-    public override string ToString() => Symbol;
-
-    public Currency() : this(string.Empty) { }
-
-    internal static Currency Empty => new(string.Empty);
-
-    public static readonly Currency EUR = new("EUR");
-    public static readonly Currency USD = new("USD");
-
-    public Money Amount(decimal amount) => new(amount, this);
 }
