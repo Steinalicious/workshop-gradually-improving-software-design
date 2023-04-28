@@ -8,7 +8,7 @@ namespace Bookstore.Data.Seeding;
 public class BookPricesSeed : IDataSeed<BookPrice>
 {
     private readonly BookstoreDbContext _dbContext;
-    private DateTime Timestamp { get; } = DateTime.UtcNow;
+    private DateTime Timestamp { get; } = DateTime.UtcNow.AddDays(-100);
 
     public BookPricesSeed(BookstoreDbContext dbContext)
     {
@@ -36,6 +36,6 @@ public class BookPricesSeed : IDataSeed<BookPrice>
     private BookPrice PriceFor(Book book)
     {
         Random rand = new(book.Title.GetStableHashCode());
-        return BookPrice.For(book, new Money(rand.Next(2500, 4800) / 100M, Currency.USD),this.Timestamp);
+        return BookPrice.For(book, new Money(rand.Next(2500, 4800) / 100M, Currency.USD), this.Timestamp);
     }
 }

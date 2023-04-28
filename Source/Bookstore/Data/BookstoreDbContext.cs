@@ -15,10 +15,7 @@ public class BookstoreDbContext : DbContext
 
     public DbSet<BookPrice> BookPrices => base.Set<BookPrice>();
 
-    // public IQueryable<BookPrice> GetBookPricesAt(DateTime time) => this.BookPrices
-    //     .Where(price => price.ValidFrom <= time)
-    //     .GroupBy(price => price.BookId)
-    //     .Select(group => group.OrderByDescending(price => price.ValidFrom).First());
+    public DbSet<Customer> Customers => base.Set<Customer>();
 
     public DbSet<Person> People => base.Set<Person>();
 
