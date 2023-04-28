@@ -1,11 +1,9 @@
 namespace Bookstore.Domain.Common;
 
-public record struct Money : IComparable<Money>
+public readonly record struct Money : IComparable<Money>
 {
-    public override string ToString() => $"{Amount:0.00} {Currency.Symbol}";
-
-    public decimal Amount { get; private set; }
-    public Currency Currency { get; private set; }
+    public decimal Amount { get; }
+    public Currency Currency { get; }
 
     public static Money Zero => new(0, Currency.Empty);
 
@@ -17,34 +15,35 @@ public record struct Money : IComparable<Money>
         Currency = currency;
     }
 
-    public Money Add(Money other)
-    {
-        if (Currency != other.Currency)
-            throw new InvalidOperationException("Cannot add money of different currencies");
+    public bool IsZero => Amount == 0;
 
-        return new Money(Amount + other.Amount, Currency);
-    }
+    public Money Add(Money other) =>
+        this.IsZero ? other
+        : other.IsZero ? this
+        : this.Currency == other.Currency ? new Money(this.Amount + other.Amount, this.Currency)
+        : throw new InvalidOperationException("Cannot add money of different currencies");
 
-    public Money Subtract(Money other)
-    {
-        if (Currency != other.Currency) throw new InvalidOperationException("Cannot subtract money of different currencies");
-        if (Amount < other.Amount) throw new InvalidOperationException("Cannot subtract more money than available");
+    public Money Subtract(Money other) =>
+        other.IsZero ? this
+        : this.Currency == other.Currency && this.Amount >= other.Amount ? new Money(this.Amount - other.Amount, this.Currency)
+        : this.Currency == other.Currency ? throw new InvalidOperationException("Cannot subtract more money than available")
+        : throw new InvalidOperationException("Cannot subtract money of different currencies");
 
-        return new Money(Amount - other.Amount, Currency);
-    }
-
-    public Money Scale(decimal factor)
-    {
-        if (factor < 0) throw new InvalidOperationException("Cannot multiply by a negative factor");
-        return new Money(Amount * factor, Currency);
-    }
+    public Money Scale(decimal factor) =>
+        factor < 0 ? throw new InvalidOperationException("Cannot multiply by a negative factor")
+        : new Money(Amount * factor, Currency);
 
     public int CompareTo(Money other) =>
-        Currency == other.Currency ? Amount.CompareTo(other.Amount)
+        this.IsZero && other.IsZero ? 0
+        : this.IsZero ? -1
+        : other.IsZero ? 1
+        : this.Currency == other.Currency ? Amount.CompareTo(other.Amount)
         : throw new InvalidOperationException("Cannot compare money of different currencies");
 
     public static Money operator +(Money left, Money right) => left.Add(right);
     public static Money operator -(Money left, Money right) => left.Subtract(right);
     public static Money operator *(Money left, decimal right) => left.Scale(right);
     public static Money operator *(decimal left, Money right) => right.Scale(left);
+
+    public override string ToString() => $"{Amount:0.00} {Currency.Symbol}";
 }
