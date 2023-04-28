@@ -1,4 +1,4 @@
-# Lesson 1: Understanding Emergent Objects
+# Understanding Emergent Objects
 
 In this lesson, we will develop a fairly complex feature in a Web application. To complete the exercise, we will need to design many interconnected classes.
 
