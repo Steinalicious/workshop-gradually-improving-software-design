@@ -14,15 +14,15 @@ public class AuthorsSeed : IDataSeed<Person>
 
     public Task SeedAsync() => Task.CompletedTask;
 
-    public Task<Person> EnsureEqualExists(Person entity)
+    public async Task<Person> EnsureEqualExists(Person entity)
     {
         if (_dbContext.People.GetPeople().ByName(entity.FirstName, entity.LastName).FirstOrDefault() is Person author)
         {
-            return Task.FromResult(author);
+            return author;
         }
 
         _dbContext.People.Add(entity);
-        _dbContext.SaveChanges();
-        return Task.FromResult(entity);
+        await _dbContext.SaveChangesAsync();
+        return entity;
     }
 }

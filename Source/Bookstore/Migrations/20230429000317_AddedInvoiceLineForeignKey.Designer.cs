@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bookstore.Migrations
 {
     [DbContext(typeof(BookstoreDbContext))]
-    partial class BookstoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230429000317_AddedInvoiceLineForeignKey")]
+    partial class AddedInvoiceLineForeignKey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,8 +121,6 @@ namespace Bookstore.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CustomerId");
-
                     b.ToTable("Invoices", "Books");
                 });
 
@@ -142,7 +143,7 @@ namespace Bookstore.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<Guid>("InvoiceId")
+                    b.Property<Guid?>("InvoiceId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Label")
@@ -191,8 +192,6 @@ namespace Bookstore.Migrations
 
                     b.HasIndex("BookId");
 
-                    b.ToTable("InvoiceLines", "Books");
-
                     b.HasDiscriminator().HasValue("BookLine");
                 });
 
@@ -224,24 +223,12 @@ namespace Bookstore.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Bookstore.Domain.Models.Invoice", b =>
-                {
-                    b.HasOne("Bookstore.Domain.Models.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-                });
-
             modelBuilder.Entity("Bookstore.Domain.Models.InvoiceLine", b =>
                 {
                     b.HasOne("Bookstore.Domain.Models.Invoice", null)
-                        .WithMany("Lines")
+                        .WithMany()
                         .HasForeignKey("InvoiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("Bookstore.Domain.Models.BookLine", b =>
@@ -258,11 +245,6 @@ namespace Bookstore.Migrations
             modelBuilder.Entity("Bookstore.Domain.Models.Book", b =>
                 {
                     b.Navigation("AuthorsCollection");
-                });
-
-            modelBuilder.Entity("Bookstore.Domain.Models.Invoice", b =>
-                {
-                    b.Navigation("Lines");
                 });
 #pragma warning restore 612, 618
         }

@@ -11,7 +11,20 @@
             <th>Issue date</th>
             <th>Due date</th>
             <th>Paid date</th>
-            <th>Total amount</th>
+            <th style="text-align: right">Total amount</th>
         </thead>
+        <tbody>
+            @foreach (var (ordinal, invoice) in Model.Invoices.Select((invoice, index) => (index + 1, invoice)))
+            {
+                <tr>
+                    <td>@ordinal</td>
+                    <td>@invoice.Customer.Label</td>
+                    <td>@invoice.IssueTime.ToString("MM/dd/yyyy")</td>
+                    <td>@invoice.DueDate.ToString("MM/dd/yyyy")</td>
+                    <td>@invoice.PaymentTime?.ToString("MM/dd/yyyy")</td>
+                    <td style="text-align: right">@invoice.TotalAmount</td>
+                </tr>
+            }
+        </tbody>
     </table>
 </div>

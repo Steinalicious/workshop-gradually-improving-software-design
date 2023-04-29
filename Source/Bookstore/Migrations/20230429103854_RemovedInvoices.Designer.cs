@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Bookstore.Migrations
 {
     [DbContext(typeof(BookstoreDbContext))]
-    partial class BookstoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230429103854_RemovedInvoices")]
+    partial class RemovedInvoices
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -120,47 +123,7 @@ namespace Bookstore.Migrations
 
                     b.HasIndex("CustomerId");
 
-                    b.ToTable("Invoices", "Books");
-                });
-
-            modelBuilder.Entity("Bookstore.Domain.Models.InvoiceLine", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18, 2)")
-                        .HasColumnName("Amount");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)")
-                        .HasColumnName("Currency");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid>("InvoiceId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Label")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("InvoiceId");
-
-                    b.ToTable("InvoiceLines", "Books");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("InvoiceLine");
-
-                    b.UseTphMappingStrategy();
+                    b.ToTable("Invoice", "Books");
                 });
 
             modelBuilder.Entity("Bookstore.Domain.Models.Person", b =>
@@ -180,20 +143,6 @@ namespace Bookstore.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("People", "Books");
-                });
-
-            modelBuilder.Entity("Bookstore.Domain.Models.BookLine", b =>
-                {
-                    b.HasBaseType("Bookstore.Domain.Models.InvoiceLine");
-
-                    b.Property<Guid>("BookId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasIndex("BookId");
-
-                    b.ToTable("InvoiceLines", "Books");
-
-                    b.HasDiscriminator().HasValue("BookLine");
                 });
 
             modelBuilder.Entity("Bookstore.Domain.Models.BookAuthor", b =>
@@ -235,34 +184,9 @@ namespace Bookstore.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("Bookstore.Domain.Models.InvoiceLine", b =>
-                {
-                    b.HasOne("Bookstore.Domain.Models.Invoice", null)
-                        .WithMany("Lines")
-                        .HasForeignKey("InvoiceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Bookstore.Domain.Models.BookLine", b =>
-                {
-                    b.HasOne("Bookstore.Domain.Models.Book", "Book")
-                        .WithMany()
-                        .HasForeignKey("BookId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Book");
-                });
-
             modelBuilder.Entity("Bookstore.Domain.Models.Book", b =>
                 {
                     b.Navigation("AuthorsCollection");
-                });
-
-            modelBuilder.Entity("Bookstore.Domain.Models.Invoice", b =>
-                {
-                    b.Navigation("Lines");
                 });
 #pragma warning restore 612, 618
         }

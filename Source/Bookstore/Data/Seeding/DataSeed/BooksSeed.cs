@@ -29,15 +29,15 @@ public class BooksSeed : IDataSeed<Book>
     private Person ToPerson((string firstName, string lastName) person) =>
         Person.CreateNew(person.firstName, person.lastName);
 
-    public Task<Book> EnsureEqualExists(Book entity)
+    public async Task<Book> EnsureEqualExists(Book entity)
     {
         if (_dbContext.Books.GetBooks().ByTitle(entity.Title).FirstOrDefault() is Book book)
         {
-            return Task.FromResult(book);
+            return book;
         }
         _dbContext.Books.Add(entity);
-        _dbContext.SaveChanges();
-        return Task.FromResult(entity);
+        await _dbContext.SaveChangesAsync();
+        return entity;
     }
 
     private (string title, (string firstName, string lastName)[] authors)[] BooksData => new (string, (string, string)[])[]

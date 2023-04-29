@@ -20,7 +20,7 @@ public class BookstoreDbContext : DbContext
     public DbSet<Person> People => base.Set<Person>();
 
     public DbSet<Invoice> Invoices => base.Set<Invoice>();
-    public DbSet<InvoiceLine> InvoiceItems => base.Set<InvoiceLine>();
+    public DbSet<InvoiceLine> InvoiceLines => base.Set<InvoiceLine>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -75,8 +75,13 @@ public class BookstoreDbContext : DbContext
             dueDate => dueDate.ToDateTime(new TimeOnly(0)),
             dateTime => DateOnly.FromDateTime(dateTime));
 
+        modelBuilder.Entity<Invoice>()
+            .Property(invoice => invoice.DueDate)
+            .HasConversion(
+                issueDate => issueDate.ToDateTime(new TimeOnly(0)),
+                dateTime => DateOnly.FromDateTime(dateTime));
+
         modelBuilder.Entity<InvoiceLine>()
-            .ToTable("InvoiceLines")
             .Ignore(line => line.Price);
 
         modelBuilder.Entity<InvoiceLine>()
@@ -94,6 +99,13 @@ public class BookstoreDbContext : DbContext
             .IsRequired();
 
         modelBuilder.Entity<BookLine>()
-            .HasBaseType<InvoiceLine>();
+            .HasBaseType<InvoiceLine>()
+            .ToTable("InvoiceLines");
+
+        modelBuilder.Entity<Invoice>()
+            .HasMany(invoice => invoice.Lines)
+            .WithOne()
+            .HasForeignKey("InvoiceId")
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

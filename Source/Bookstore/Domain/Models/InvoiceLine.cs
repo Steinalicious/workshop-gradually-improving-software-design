@@ -5,6 +5,7 @@ namespace Bookstore.Domain.Models;
 public abstract class InvoiceLine
 {
     public Guid Id { get; private set; } = Guid.Empty;
+    public Guid InvoiceId { get; private set; } = Guid.Empty;
     public string Label { get; private set; } = string.Empty;
     public int Quantity { get; private set; } = 1;
     public Money Price
@@ -18,8 +19,8 @@ public abstract class InvoiceLine
 
     protected InvoiceLine() { }      // Used by EF Core
 
-    protected InvoiceLine(Guid id, string label, int quantity, Money price) =>
-        (Label, Id, Quantity, Price) = (label, id, quantity, price);
+    protected InvoiceLine(Guid invoiceId, Guid id, string label, int quantity, Money price) =>
+        (InvoiceId, Label, Id, Quantity, Price) = (invoiceId, label, id, quantity, price);
 
     public void Increment(int quantity, Money price)
     {
