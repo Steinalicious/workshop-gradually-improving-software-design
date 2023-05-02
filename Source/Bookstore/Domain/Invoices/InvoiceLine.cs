@@ -1,6 +1,6 @@
 using Bookstore.Domain.Common;
 
-namespace Bookstore.Domain.Models;
+namespace Bookstore.Domain.Invoices;
 
 public abstract class InvoiceLine
 {

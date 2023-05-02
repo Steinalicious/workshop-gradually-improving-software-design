@@ -1,11 +1,12 @@
 using Bookstore.Domain.Common;
+using Bookstore.Domain.Invoices;
 using Bookstore.Domain.Models;
 using Bookstore.Domain.Specifications;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Data.Seeding.DataSeed;
 
-public class InvoicesSeed : IDataSeed<Invoice>
+public class InvoicesSeed : IDataSeed<InvoiceRecord>
 {
     private readonly ILogger<InvoicesSeed> _logger;
     private readonly BookstoreDbContext _context;
@@ -16,7 +17,7 @@ public class InvoicesSeed : IDataSeed<Invoice>
     public InvoicesSeed(ILogger<InvoicesSeed> logger, BookstoreDbContext context, IDataSeed<Book> booksSeed, IDataSeed<BookPrice> pricesSeed, IDataSeed<Customer> customersSeed) =>
         (_logger, _context, _booksSeed, _pricesSeed, _customersSeed) = (logger, context, booksSeed, pricesSeed, customersSeed);
 
-    public Task<Invoice> EnsureEqualExists(Invoice entity) => Task.FromResult(entity);
+    public Task<InvoiceRecord> EnsureEqualExists(InvoiceRecord entity) => Task.FromResult(entity);
 
     public async Task SeedAsync()
     {
@@ -34,18 +35,19 @@ public class InvoicesSeed : IDataSeed<Invoice>
 
         for (int i = 0; i < invoicesCount; i++)
         {
-            Invoice invoice = Invoice.CreateNew(
-                customers[rand.Next(0, customers.Length)],
-                DateTime.Now.AddDays(-rand.Next(0, 40)),
-                rand.Next(10, 60));
+            Customer customer = customers[rand.Next(0, customers.Length)];
+            DateTime issueTime = DateTime.Now.AddDays(-rand.Next(0, 40));
+            DateOnly dueDate = DateOnly.FromDateTime(issueTime).AddDays(rand.Next(10, 60));
 
-            _context.Invoices.Add(invoice);
+            InvoiceRecord record = new(Guid.NewGuid(), customer, issueTime, dueDate);
+            _context.Invoices.Add(record);
 
             int booksCount = rand.Next(1, 5);
             for (int j = 0; j < booksCount; j++)
             {
                 (Book book, Money price) = bookPrices[rand.Next(0, bookPrices.Length)];
-                InvoiceLine line = invoice.Add(book, price);
+                InvoiceLine line = BookLine.CreateNew(record, book, price);
+                record.Lines.Add(line);
                 _context.InvoiceLines.Add(line);
             }
         }

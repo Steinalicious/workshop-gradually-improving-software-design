@@ -1,4 +1,5 @@
 using Bookstore.Domain.Common;
+using Bookstore.Domain.Invoices;
 using Bookstore.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
@@ -19,7 +20,7 @@ public class BookstoreDbContext : DbContext
 
     public DbSet<Person> People => base.Set<Person>();
 
-    public DbSet<Invoice> Invoices => base.Set<Invoice>();
+    public DbSet<InvoiceRecord> Invoices => base.Set<InvoiceRecord>();
     public DbSet<InvoiceLine> InvoiceLines => base.Set<InvoiceLine>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -71,11 +72,13 @@ public class BookstoreDbContext : DbContext
                 symbol => new Currency(symbol))
             .IsRequired();
 
-        modelBuilder.Entity<Invoice>().Property(invoice => invoice.DueDate).HasConversion(
+        modelBuilder.Entity<InvoiceRecord>().ToTable("Invoices");
+
+        modelBuilder.Entity<InvoiceRecord>().Property(invoice => invoice.DueDate).HasConversion(
             dueDate => dueDate.ToDateTime(new TimeOnly(0)),
             dateTime => DateOnly.FromDateTime(dateTime));
 
-        modelBuilder.Entity<Invoice>()
+        modelBuilder.Entity<InvoiceRecord>()
             .Property(invoice => invoice.DueDate)
             .HasConversion(
                 issueDate => issueDate.ToDateTime(new TimeOnly(0)),
@@ -102,7 +105,7 @@ public class BookstoreDbContext : DbContext
             .HasBaseType<InvoiceLine>()
             .ToTable("InvoiceLines");
 
-        modelBuilder.Entity<Invoice>()
+        modelBuilder.Entity<InvoiceRecord>()
             .HasMany(invoice => invoice.Lines)
             .WithOne()
             .HasForeignKey("InvoiceId")

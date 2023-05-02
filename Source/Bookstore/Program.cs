@@ -4,6 +4,7 @@ using Bookstore.Domain.Models;
 using Bookstore.Domain.Discounts;
 using Bookstore.Domain.Discounts.Implementation;
 using Microsoft.EntityFrameworkCore;
+using Bookstore.Domain.Invoices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,6 +16,10 @@ string bookstoreConnectionString =
 builder.Services.AddDbContext<BookstoreDbContext>(options =>
     options.UseSqlServer(bookstoreConnectionString));
 
+builder.Services.AddScoped<InvoiceFactory>(_ => new InvoiceFactory(
+    DateOnly.FromDateTime(DateTime.UtcNow),
+    builder.Configuration.GetValue<int>("Invoicing:ToleranceDays", 30)));
+
 builder.Services.AddSingleton<IDiscount>(_ =>
     (new RelativeDiscount(0.15M).Then(new TitlePrefixDiscount(.10M, "C"))).And(new TitleContentDiscount(.25M, "Code")).CapTo(.30M));
 
@@ -24,7 +29,7 @@ if (builder.Environment.IsDevelopment())
     builder.Services.AddScoped<IDataSeed<Book>, BooksSeed>();
     builder.Services.AddScoped<IDataSeed<BookPrice>, BookPricesSeed>();
     builder.Services.AddScoped<IDataSeed<Customer>, CustomersSeed>();
-    builder.Services.AddScoped<IDataSeed<Invoice>, InvoicesSeed>();
+    builder.Services.AddScoped<IDataSeed<InvoiceRecord>, InvoicesSeed>();
 }
 else
 {
@@ -32,7 +37,7 @@ else
     builder.Services.AddScoped<IDataSeed<Book>, NoSeed<Book>>();
     builder.Services.AddScoped<IDataSeed<BookPrice>, NoSeed<BookPrice>>();
     builder.Services.AddScoped<IDataSeed<Customer>, NoSeed<Customer>>();
-    builder.Services.AddScoped<IDataSeed<Invoice>, NoSeed<Invoice>>();
+    builder.Services.AddScoped<IDataSeed<InvoiceRecord>, NoSeed<InvoiceRecord>>();
 }
 
 var app = builder.Build();
