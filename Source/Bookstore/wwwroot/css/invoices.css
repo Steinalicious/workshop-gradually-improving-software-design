@@ -1,0 +1,16 @@
+tr.invoice-paid {
+    background-color: rgb(97, 255, 97);
+}
+
+tr.invoice-open {
+    background-color: rgb(236, 236, 109);
+}
+
+tr.invoice-outstanding {
+    background-color: rgb(247, 204, 204);
+}
+
+tr.invoice-overdue {
+    background-color: rgb(187, 67, 67);
+    color: white;
+}
