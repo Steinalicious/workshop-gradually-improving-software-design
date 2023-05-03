@@ -11,6 +11,14 @@ public abstract class Invoice
 
     protected Invoice(InvoiceRecord representation) => Representation = representation;
 
+    public Guid Id => this.Representation.Id;
+    public string Label => this.Representation.Customer.Label;
+    public DateOnly IssueDate => DateOnly.FromDateTime(this.Representation.IssueTime);
+    public Money Total => this.Representation.Lines
+        .Aggregate(Money.Zero, (total, line) => total + line.Price);
+
+    public abstract (string prefix, DateOnly date) Status { get; }
+
     public InvoiceLine Add(Book book, Money price)
     {
         if (this.Representation.Lines.OfType<BookLine>().FirstOrDefault(line => line.Book.Id == book.Id) is BookLine line)
@@ -32,6 +40,8 @@ public class PaidInvoice : Invoice
     public DateTime PaymentTime => base.Representation.PaymentTime.HasValue
         ? this.Representation.PaymentTime.Value
         : throw new UnreachableException();
+
+    public override (string prefix, DateOnly date) Status => ("Paid", DateOnly.FromDateTime(this.PaymentTime));
 }
 
 public abstract class UnpaidInvoice : Invoice
@@ -48,14 +58,20 @@ public abstract class UnpaidInvoice : Invoice
 public class OpenInvoice : UnpaidInvoice
 {
     internal OpenInvoice(InvoiceRecord representation) : base(representation) { }
+
+    public override (string prefix, DateOnly date) Status => ("Due on", base.Representation.DueDate);
 }
 
 public class OutstandingInvoice : UnpaidInvoice
 {
     internal OutstandingInvoice(InvoiceRecord representation) : base(representation) { }
+
+    public override (string prefix, DateOnly date) Status => ("Past due since", base.Representation.DueDate);
 }
 
 public class OverdueInvoice : UnpaidInvoice
 {
     internal OverdueInvoice(InvoiceRecord representation) : base(representation) { }
+
+    public override (string prefix, DateOnly date) Status => ("Overdue since", base.Representation.DueDate);
 }

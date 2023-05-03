@@ -4,25 +4,23 @@
     ViewData["Title"] = "Home page";
 }
 <div class="text-center">
-    <table class="table table-striped">
+    <table class="table">
         <thead>
             <th>#</th>
             <th>Issued to</th>
             <th>Issue date</th>
-            <th>Due date</th>
-            <th>Paid date</th>
+            <th style="text-align: right">Status</th>
             <th style="text-align: right">Total amount</th>
         </thead>
         <tbody>
-            @foreach (var (ordinal, invoice) in Model.Invoices.Select((invoice, index) => (index + 1, invoice)))
+            @foreach (var row in Model.Invoices)
             {
-                <tr>
-                    <td>@ordinal</td>
-                    <td>@invoice.Customer.Label</td>
-                    <td>@invoice.IssueTime.ToString("MM/dd/yyyy")</td>
-                    <td>@invoice.DueDate.ToString("MM/dd/yyyy")</td>
-                    <td>@invoice.PaymentTime?.ToString("MM/dd/yyyy")</td>
-                    <td style="text-align: right">@invoice.TotalAmount</td>
+                <tr class="invoice-@row.Style">
+                    <td>@row.Ordinal</td>
+                    <td>@row.Label</td>
+                    <td>@row.IssueDate</td>
+                    <td style="text-align: right">@row.Status</td>
+                    <td style="text-align: right">@row.Total</td>
                 </tr>
             }
         </tbody>
