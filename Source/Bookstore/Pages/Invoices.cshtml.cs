@@ -10,7 +10,7 @@ namespace Bookstore.Pages;
 
 public class InvoicesModel : PageModel
 {
-    public record InvoiceRow(Guid Id, int Ordinal, string Label, string IssueDate, string Status, Money Total, string Style);
+    public record InvoiceRow(Guid Id, int Ordinal, string Label, string IssueDate, string Status, Money Total, string Style, bool AllowPayment);
 
     private readonly ILogger<IndexModel> _logger;
     private readonly BookstoreDbContext _context;
@@ -25,6 +25,18 @@ public class InvoicesModel : PageModel
     public async Task OnGet()
     {
         await _invoicesSeed.SeedAsync();
+        await PopulateInvoices();
+    }
+
+    public async Task<IActionResult> OnPost(Guid invoiceId)
+    {
+        _logger.LogInformation($"Payment for invoice {invoiceId} received.");
+        await PopulateInvoices();
+        return Page();
+    }
+
+    private async Task PopulateInvoices()
+    {
 
         var records = await _context.Invoices
             .Include(invoice => invoice.Customer)
@@ -41,7 +53,7 @@ public class InvoicesModel : PageModel
             invoice.Id, ordinal, invoice.Label,
             invoice.IssueDate.ToString("MM/dd/yyyy"),
             $"{invoice.Status.prefix} {invoice.Status.date}",
-            invoice.Total, ToStyle(invoice));
+            invoice.Total, ToStyle(invoice), invoice is UnpaidInvoice);
 
     private static string ToStyle(Invoice invoice) =>
         invoice.GetType().Name.Replace("Invoice", "").ToLower();
