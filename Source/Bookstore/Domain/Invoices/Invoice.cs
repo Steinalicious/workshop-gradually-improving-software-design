@@ -12,6 +12,7 @@ public abstract class Invoice
     protected Invoice(InvoiceRecord representation) => Representation = representation;
 
     public Guid Id => this.Representation.Id;
+    public Customer Customer => this.Representation.Customer;
     public string Label => this.Representation.Customer.Label;
     public DateOnly IssueDate => DateOnly.FromDateTime(this.Representation.IssueTime);
     public Money Total => this.Representation.Lines
@@ -46,6 +47,8 @@ public class PaidInvoice : Invoice
 
 public abstract class UnpaidInvoice : Invoice
 {
+    public DateOnly DueDate => base.Representation.DueDate;
+
     protected UnpaidInvoice(InvoiceRecord representation) : base(representation) { }
 
     public Invoice Pay(DateTime at)

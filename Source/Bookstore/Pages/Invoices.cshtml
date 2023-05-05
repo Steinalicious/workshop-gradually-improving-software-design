@@ -36,3 +36,26 @@
         </tbody>
     </table>
 </div>
+
+<div class="text-center">
+    <table class="table">
+        <thead>
+            <th colspan="3">Delinquent customers</th>
+        </thead>
+        <thead>
+            <th>#</th>
+            <th>Issued to</th>
+            <th>Total amount</th>
+        </thead>
+        <tbody>
+            @foreach (var notification in Model.DelinquentCustomers.OrderBy(notification => notification.IssuedTo))
+            {
+                <tr>
+                    <td>@notification.Ordinal</td>
+                    <td>@notification.IssuedTo</td>
+                    <td>@notification.Amount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -11,6 +11,7 @@ namespace Bookstore.Pages;
 public class InvoicesModel : PageModel
 {
     public record InvoiceRow(Guid Id, int Ordinal, string Label, string IssueDate, string Status, Money Total, string Style, bool AllowPayment);
+    public record DelinquentRow(int Ordinal, string IssuedTo, Money Amount);
 
     private readonly ILogger<IndexModel> _logger;
     private readonly BookstoreDbContext _context;
@@ -18,6 +19,7 @@ public class InvoicesModel : PageModel
     private readonly InvoiceFactory _invoiceFactory;
 
     public IEnumerable<InvoiceRow> Invoices { get; private set; } = Enumerable.Empty<InvoiceRow>();
+    public IEnumerable<DelinquentRow> DelinquentCustomers { get; private set; } = Enumerable.Empty<DelinquentRow>();
 
     public InvoicesModel(ILogger<IndexModel> logger, BookstoreDbContext context, IDataSeed<InvoiceRecord> invoicesSeed, InvoiceFactory invoiceFactory) => 
         (_logger, _context, _invoicesSeed, _invoiceFactory) = (logger, context, invoicesSeed, invoiceFactory);
@@ -26,6 +28,7 @@ public class InvoicesModel : PageModel
     {
         await _invoicesSeed.SeedAsync();
         await PopulateInvoices();
+        await PopulateDelinquentCustomers();
     }
 
     public async Task<IActionResult> OnPost(Guid invoiceId)
@@ -40,13 +43,11 @@ public class InvoicesModel : PageModel
         {
             _logger.LogWarning("Invoice {invoiceId} not found", invoiceId);
         }
-        await PopulateInvoices();
         return RedirectToPage("/invoices");
     }
 
     private async Task PopulateInvoices()
     {
-
         var records = await _context.Invoices
             .Include(invoice => invoice.Customer)
             .Include(invoice => invoice.Lines)
@@ -57,6 +58,12 @@ public class InvoicesModel : PageModel
         this.Invoices = invoices.Select((record, index) => ToRow(index + 1, record)).ToList();
     }
 
+    private async Task PopulateDelinquentCustomers() => 
+        this.DelinquentCustomers = (await GetDelinquentCustomers())
+            .GetNotifications()
+            .Select((notification, index) => new DelinquentRow(index + 1, notification.Customer.Label, notification.Amount))
+            .ToList();
+
     private static InvoiceRow ToRow(int ordinal, Invoice invoice) =>
         new InvoiceRow(
             invoice.Id, ordinal, invoice.Label,
@@ -66,4 +73,16 @@ public class InvoicesModel : PageModel
 
     private static string ToStyle(Invoice invoice) =>
         invoice.GetType().Name.Replace("Invoice", "").ToLower();
+
+    private async Task<IDelinquent> GetDelinquentCustomers() =>
+        _invoiceFactory
+            .ToModels(await GetDelinquentInvoiceRecords())
+            .Aggregate(IDelinquent.Empty, (delinquent, invoice) => delinquent.Add(invoice));
+
+    private async Task<IEnumerable<InvoiceRecord>> GetDelinquentInvoiceRecords() =>
+        await _context.Invoices
+            .Include(invoice => invoice.Customer)
+            .Include(invoice => invoice.Lines)
+            .Where(_invoiceFactory.DelinquentInvoiceTest)
+            .ToListAsync();
 }

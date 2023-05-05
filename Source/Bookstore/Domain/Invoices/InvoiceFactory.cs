@@ -1,3 +1,5 @@
+using System.Linq.Expressions;
+
 namespace Bookstore.Domain.Invoices;
 
 public class InvoiceFactory
@@ -17,4 +19,8 @@ public class InvoiceFactory
 
     public IEnumerable<Invoice> ToModels(IEnumerable<InvoiceRecord> representations) =>
         representations.Select(ToModel);
+
+    public Expression<Func<InvoiceRecord, bool>> DelinquentInvoiceTest => invoice => 
+        invoice.PaymentTime == null &&
+        invoice.DueDate < this.OnDate.AddDays(-this.DelinquencyDays);
 }
