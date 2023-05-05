@@ -30,9 +30,18 @@ public class InvoicesModel : PageModel
 
     public async Task<IActionResult> OnPost(Guid invoiceId)
     {
-        _logger.LogInformation($"Payment for invoice {invoiceId} received.");
+        if (_context.Invoices.Find(invoiceId) is InvoiceRecord record)
+        {
+            record.PaymentTime = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Invoice {invoiceId} paid", invoiceId);
+        }
+        else
+        {
+            _logger.LogWarning("Invoice {invoiceId} not found", invoiceId);
+        }
         await PopulateInvoices();
-        return Page();
+        return RedirectToPage("/invoices");
     }
 
     private async Task PopulateInvoices()

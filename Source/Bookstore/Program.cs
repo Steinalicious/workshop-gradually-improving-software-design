@@ -11,6 +11,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorPages();
 
+ConfigurationManager configuration = builder.Configuration;
+
 string bookstoreConnectionString =
     builder.Configuration.GetConnectionString("BookstoreConnection") ?? string.Empty;
 builder.Services.AddDbContext<BookstoreDbContext>(options =>
@@ -18,7 +20,8 @@ builder.Services.AddDbContext<BookstoreDbContext>(options =>
 
 builder.Services.AddScoped<InvoiceFactory>(_ => new InvoiceFactory(
     DateOnly.FromDateTime(DateTime.UtcNow),
-    builder.Configuration.GetValue<int>("Invoicing:ToleranceDays", 30)));
+    configuration.GetValue<int>("Invoicing:ToleranceDays", 30),
+    configuration.GetValue<int>("Invoicing:DelinquencyDays", 10)));
 
 builder.Services.AddSingleton<IDiscount>(_ =>
     (new RelativeDiscount(0.15M).Then(new TitlePrefixDiscount(.10M, "C"))).And(new TitleContentDiscount(.25M, "Code")).CapTo(.30M));
