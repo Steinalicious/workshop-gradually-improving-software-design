@@ -11,6 +11,7 @@
             <th>Issue date</th>
             <th style="text-align: right">Status</th>
             <th style="text-align: right">Total amount</th>
+            <th></th>
         </thead>
         <tbody>
             @foreach (var row in Model.Invoices)
@@ -21,6 +22,15 @@
                     <td>@row.IssueDate</td>
                     <td style="text-align: right">@row.Status</td>
                     <td style="text-align: right">@row.Total</td>
+                    <td>
+                        @if (row.AllowPayment)
+                        {
+                            <form method="post">
+                                <input type="hidden" name="invoiceId" value="@row.Id" />
+                                <button type="submit" class="btn btn-primary">Paid</button>
+                            </form>
+                        }
+                    </td>
                 </tr>
             }
         </tbody>

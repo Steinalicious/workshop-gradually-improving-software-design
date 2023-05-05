@@ -10,7 +10,7 @@ namespace Bookstore.Pages;
 
 public class InvoicesModel : PageModel
 {
-    public record InvoiceRow(Guid Id, int Ordinal, string Label, string IssueDate, string Status, Money Total, string Style);
+    public record InvoiceRow(Guid Id, int Ordinal, string Label, string IssueDate, string Status, Money Total, string Style, bool AllowPayment);
 
     private readonly ILogger<IndexModel> _logger;
     private readonly BookstoreDbContext _context;
@@ -25,7 +25,26 @@ public class InvoicesModel : PageModel
     public async Task OnGet()
     {
         await _invoicesSeed.SeedAsync();
+        await PopulateInvoices();
+    }
 
+    public async Task<IActionResult> OnPost(Guid invoiceId)
+    {
+        if (_context.Invoices.Find(invoiceId) is InvoiceRecord record)
+        {
+            record.PaymentTime = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Invoice {invoiceId} paid", invoiceId);
+        }
+        else
+        {
+            _logger.LogWarning("Invoice {invoiceId} not found", invoiceId);
+        }
+        return RedirectToPage("/invoices");
+    }
+
+    private async Task PopulateInvoices()
+    {
         var records = await _context.Invoices
             .Include(invoice => invoice.Customer)
             .Include(invoice => invoice.Lines)
@@ -41,7 +60,7 @@ public class InvoicesModel : PageModel
             invoice.Id, ordinal, invoice.Label,
             invoice.IssueDate.ToString("MM/dd/yyyy"),
             $"{invoice.Status.prefix} {invoice.Status.date}",
-            invoice.Total, ToStyle(invoice));
+            invoice.Total, ToStyle(invoice), invoice is UnpaidInvoice);
 
     private static string ToStyle(Invoice invoice) =>
         invoice.GetType().Name.Replace("Invoice", "").ToLower();
