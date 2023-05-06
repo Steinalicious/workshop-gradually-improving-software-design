@@ -15,4 +15,11 @@ public static class BookSpecifications
 
     public static IQueryable<Book> ByTitle(this IQueryable<Book> books, string title) =>
         books.Where(book => book.Title == title);
+
+    public static IQueryable<Book> ByAuthorInitial(this IQueryable<Book> books, string initial) =>
+        books.Where(book => book.AuthorsCollection.Any(author => author.Person.LastName.StartsWith(initial)));
+
+    public static IQueryable<Book> ByOptionalAuthorInitial(this IQueryable<Book> books, string? initial) =>
+        initial is null ? books
+        : books.ByAuthorInitial(initial);
 }
