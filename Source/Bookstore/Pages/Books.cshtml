@@ -1,7 +1,18 @@
-﻿@page
+﻿@page "{initial?}"
 @model BooksModel
 @{
     ViewData["Title"] = "Home page";
+}
+
+@if (Model.PublishedAuthorInitials.Any())
+{
+    <div class="text-left">
+        <a class="btn btn-primary" href="/books">All</a>
+        @foreach (string initial in Model.PublishedAuthorInitials)
+        {
+            <a class="btn btn-primary" href="/books?initial=@initial.ToLower()">@initial.ToUpper()</a>
+        }
+    </div>
 }
 
 <div class="text-center">
