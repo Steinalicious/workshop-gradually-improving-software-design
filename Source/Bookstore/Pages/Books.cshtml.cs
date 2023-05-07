@@ -12,7 +12,6 @@ public class BooksModel : PageModel
     private readonly ILogger<IndexModel> _logger;
     private readonly BookstoreDbContext _dbContext;
     public IEnumerable<Book> Books { get; private set; } = Enumerable.Empty<Book>();
-    public IReadOnlyList<string> PublishedAuthorInitials { get; private set; } = Array.Empty<string>();
     private readonly IDataSeed<Book> _booksSeed;
 
     public BooksModel(ILogger<IndexModel> logger, BookstoreDbContext dbContext, IDataSeed<Book> booksSeed)
@@ -22,24 +21,9 @@ public class BooksModel : PageModel
         _booksSeed = booksSeed;
     }
 
-    public async Task OnGet([FromQuery] string? initial)
+    public async Task OnGet()
     {
         await this._booksSeed.SeedAsync();
-        await this.PopulatePublishedAuthorInitials();
-        await this.PopulateBooks(initial);
+        this.Books = await _dbContext.Books.GetBooks().OrderBy(book => book.Title).ToListAsync();
     }
-
-    private async Task PopulatePublishedAuthorInitials() =>
-        this.PublishedAuthorInitials  = await _dbContext.BookAuthors
-            .GetPublishedAuthors()
-            .Select(author => author.LastName.Substring(0, 1))
-            .Distinct()
-            .OrderBy(initial => initial)
-            .ToListAsync();
-
-    private async Task PopulateBooks(string? authorInitial) =>
-        this.Books = await _dbContext.Books.GetBooks()
-            .ByOptionalAuthorInitial(authorInitial)
-            .OrderBy(book => book.Title)
-            .ToListAsync();
 }
