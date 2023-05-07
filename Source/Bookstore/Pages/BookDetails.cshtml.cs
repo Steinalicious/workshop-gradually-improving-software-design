@@ -56,7 +56,7 @@ public class BookDetailsModel : PageModel
     private async Task PopulateRecommendedBooks()
     {
         string[] words = this.Book.Title.SplitIntoWords().Where(word => word.Length > 3).ToArray();
-        _logger.LogInformation("Title: {title}; words: {words}", this.Book.Title, string.Join(", ", words));
+        _logger.LogInformation("Recommending books for [{title}]; words to use: {words}", this.Book.Title, string.Join(", ", words));
         var candidateBooks = await _dbContext.Books.GetBooks().ToListAsync();
 
         this.RecommendedBooks = candidateBooks
