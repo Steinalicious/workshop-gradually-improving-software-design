@@ -1,4 +1,5 @@
-﻿using Bookstore.Data.Seeding;
+﻿using Bookstore.Data;
+using Bookstore.Data.Seeding;
 using Bookstore.Domain.Models;
 using Bookstore.Domain.Specifications;
 using Microsoft.AspNetCore.Mvc;
@@ -10,12 +11,12 @@ namespace Bookstore.Pages;
 public class BooksModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
-    private readonly BookstoreDbContext _dbContext;
+    private readonly IUnitOfWork _dbContext;
     public IEnumerable<Book> Books { get; private set; } = Enumerable.Empty<Book>();
     public IReadOnlyList<string> PublishedAuthorInitials { get; private set; } = Array.Empty<string>();
     private readonly IDataSeed<Book> _booksSeed;
 
-    public BooksModel(ILogger<IndexModel> logger, BookstoreDbContext dbContext, IDataSeed<Book> booksSeed)
+    public BooksModel(ILogger<IndexModel> logger, IUnitOfWork dbContext, IDataSeed<Book> booksSeed)
     {
         _logger = logger;
         _dbContext = dbContext;
@@ -30,7 +31,7 @@ public class BooksModel : PageModel
     }
 
     private async Task PopulatePublishedAuthorInitials() =>
-        this.PublishedAuthorInitials  = await _dbContext.BookAuthors
+        this.PublishedAuthorInitials  = await ((BookstoreDbContext)_dbContext).BookAuthors      // Requires redefinition when specifications are implemented
             .GetPublishedAuthors()
             .Select(author => author.LastName.Substring(0, 1))
             .Distinct()
@@ -39,7 +40,7 @@ public class BooksModel : PageModel
 
     private async Task PopulateBooks(string? authorInitial)
     {
-        IQueryable<Book> allBooks = _dbContext.Books.Include(book => book.AuthorsCollection).ThenInclude(bookAuthor => bookAuthor.Person);
+        IQueryable<Book> allBooks = _dbContext.Books.All;
 
         IQueryable<Book> books = authorInitial is null ? allBooks
         : allBooks.Where(book => book.AuthorsCollection.Any(author => author.Person.LastName.StartsWith(authorInitial)));

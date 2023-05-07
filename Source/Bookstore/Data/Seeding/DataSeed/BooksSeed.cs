@@ -17,7 +17,7 @@ public class BooksSeed : IDataSeed<Book>
 
     public async Task SeedAsync()
     {
-        if (_dbContext.Books.Any()) return;
+        if (_dbContext.BooksDbSet.Any()) return;
 
         foreach ((string title, (string firstName, string lastName)[] authors) bookData in BooksData)
         {
@@ -32,11 +32,11 @@ public class BooksSeed : IDataSeed<Book>
 
     public async Task<Book> EnsureEqualExists(Book entity)
     {
-        if (_dbContext.Books.Include(book => book.AuthorsCollection).ThenInclude(bookAuthor => bookAuthor.Person).Where(book => book.Title == entity.Title).FirstOrDefault() is Book book)
+        if (_dbContext.Books.All.Where(book => book.Title == entity.Title).FirstOrDefault() is Book book)
         {
             return book;
         }
-        _dbContext.Books.Add(entity);
+        _dbContext.BooksDbSet.Add(entity);
         await _dbContext.SaveChangesAsync();
         return entity;
     }

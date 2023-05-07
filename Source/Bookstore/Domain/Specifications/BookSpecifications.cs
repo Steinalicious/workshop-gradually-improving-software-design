@@ -5,4 +5,5 @@ namespace Bookstore.Domain.Specifications;
 
 public static class BookSpecifications
 {
+
 }

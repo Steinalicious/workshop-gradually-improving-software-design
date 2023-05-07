@@ -17,18 +17,18 @@ public class BookPricesSeed : IDataSeed<BookPrice>
 
     public async Task<BookPrice> EnsureEqualExists(BookPrice entity)
     {
-        if (_dbContext.BookPrices.ForBook(entity.BookId).FirstOrDefault() is BookPrice existing) return existing;
+        if (_dbContext.BookPricesDbSet.ForBook(entity.BookId).FirstOrDefault() is BookPrice existing) return existing;
 
-        _dbContext.BookPrices.Add(entity);
+        _dbContext.BookPricesDbSet.Add(entity);
         await _dbContext.SaveChangesAsync();
         return entity;
     }
 
     public async Task SeedAsync()
     {
-        if (await _dbContext.BookPrices.AnyAsync()) return;
+        if (await _dbContext.BookPricesDbSet.AnyAsync()) return;
 
-        IEnumerable<Book> books = await _dbContext.Books.ToListAsync();
+        IEnumerable<Book> books = await _dbContext.BooksDbSet.ToListAsync();
         foreach (Book book in books)
         {
             await EnsureEqualExists(this.PriceFor(book));
