@@ -1,7 +1,18 @@
-﻿@page
+﻿@page "{initial?}"
 @model BooksModel
 @{
     ViewData["Title"] = "Home page";
+}
+
+@if (Model.PublishedAuthorInitials.Any())
+{
+    <div class="text-left">
+        <a class="btn btn-primary" href="/books">All</a>
+        @foreach (string initial in Model.PublishedAuthorInitials)
+        {
+            <a class="btn btn-primary" href="/books?initial=@initial.ToLower()">@initial.ToUpper()</a>
+        }
+    </div>
 }
 
 <div class="text-center">
@@ -19,7 +30,7 @@
                     <td>@ordinal</td>
                     <td style="text-align: left">@string.Join(", ", book.Authors.Select(person => $"{person.FirstName} {person.LastName}"))</td>
                     <td style="text-align: left">@book.Title</td>
-                    <td><a class="btn btn-primary" href="/books/@book.Id">View</a></td>
+                    <td><a class="btn btn-primary" href="/book/@book.Id">View</a></td>
                 </tr>
             }
     </table>
