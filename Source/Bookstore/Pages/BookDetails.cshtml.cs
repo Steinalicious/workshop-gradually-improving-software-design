@@ -20,7 +20,8 @@ public class BookDetailsModel : PageModel
 
     public Book Book { get; private set; } = null!;
 
-    public IReadOnlyList<PriceLine> PriceSpecification { get; private set; } = new List<PriceLine>();
+    public IReadOnlyList<PriceLine> PriceSpecification { get; private set; } = Array.Empty<PriceLine>();
+    public IReadOnlyList<Book> RecommendedBooks { get; private set; } = Array.Empty<Book>();
 
     public BookDetailsModel(ILogger<IndexModel> logger, BookstoreDbContext dbContext, IDataSeed<BookPrice> bookPricesSeed, IDiscount discount, IDataSeed<BookPrice> bookPricesSeed2)
     {
@@ -36,18 +37,44 @@ public class BookDetailsModel : PageModel
         await _bookPricesSeed.SeedAsync();
         if ((await _dbContext.Books.GetBooks().ById(id)) is Book book)
         {
-            
             this.Book = book;
-            this.Discount = this.Discount.Within(new DiscountContext(book));
-
-            Money? originalPrice = (await _dbContext.BookPrices.For(book).At(DateTime.Now).FirstOrDefaultAsync())?.Price;
-            this.PriceSpecification = originalPrice.HasValue ? this.CalculatePriceLines(originalPrice.Value) : new List<PriceLine>();
-
+            await this.PopulatePriceSpecification();
+            await this.PopulateRecommendedBooks();
             return Page();
         }
 
         return Redirect("/books");
     }
+
+    private async Task PopulatePriceSpecification()
+    {
+        this.Discount = this.Discount.Within(new DiscountContext(this.Book));
+        Money? originalPrice = (await _dbContext.BookPrices.For(this.Book).At(DateTime.Now).FirstOrDefaultAsync())?.Price;
+        this.PriceSpecification = originalPrice.HasValue ? this.CalculatePriceLines(originalPrice.Value) : new List<PriceLine>();
+    }
+
+    private async Task PopulateRecommendedBooks()
+    {
+        string[] words = this.Book.Title.SplitIntoWords().Where(word => word.Length > 3).ToArray();
+        _logger.LogInformation("Title: {title}; words: {words}", this.Book.Title, string.Join(", ", words));
+        var candidateBooks = await _dbContext.Books.GetBooks().ToListAsync();
+
+        this.RecommendedBooks = candidateBooks
+            .Select(book => (book, score: this.GetRecommendationScore(book, words)))
+            .Where(bookScore => bookScore.book.Id != this.Book.Id && bookScore.score > 0)
+            .OrderByDescending(bookScore => bookScore.score)
+            .Take(3)
+            .Select(bookScore => bookScore.book)
+            .ToList();
+
+        foreach (var recommended in this.RecommendedBooks)
+        {
+            _logger.LogInformation("Recommended: {title}", recommended.Title);
+        }
+    }
+
+    private int GetRecommendationScore(Book book, string[] targetWords) =>
+        book.Title.SplitIntoWords().Intersect(targetWords).Count();
 
     private List<PriceLine> CalculatePriceLines(Money originalPrice)
     {
