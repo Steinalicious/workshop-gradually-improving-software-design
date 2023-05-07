@@ -6,6 +6,7 @@ using Bookstore.Domain.Specifications;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Bookstore.Data;
 
 namespace Bookstore.Pages;
 
@@ -14,7 +15,7 @@ public class BookDetailsModel : PageModel
     public record PriceLine(string Label, Money Amount);
 
     private readonly ILogger<IndexModel> _logger;
-    private readonly BookstoreDbContext _dbContext;
+    private readonly IUnitOfWork _dbContext;
     private readonly IDataSeed<BookPrice> _bookPricesSeed;
     private IDiscount Discount { get; set; }
 
@@ -23,7 +24,8 @@ public class BookDetailsModel : PageModel
     public IReadOnlyList<PriceLine> PriceSpecification { get; private set; } = Array.Empty<PriceLine>();
     public IReadOnlyList<Book> RecommendedBooks { get; private set; } = Array.Empty<Book>();
 
-    public BookDetailsModel(ILogger<IndexModel> logger, BookstoreDbContext dbContext, IDataSeed<BookPrice> bookPricesSeed, IDiscount discount, IDataSeed<BookPrice> bookPricesSeed2)
+    public BookDetailsModel(ILogger<IndexModel> logger, IUnitOfWork dbContext, IDataSeed<BookPrice> bookPricesSeed,
+                            IDiscount discount, IDataSeed<BookPrice> bookPricesSeed2)
     {
         _logger = logger;
         _dbContext = dbContext;
@@ -35,7 +37,7 @@ public class BookDetailsModel : PageModel
     public async Task<IActionResult> OnGet(Guid id)
     {
         await _bookPricesSeed.SeedAsync();
-        if ((await _dbContext.Books.GetBooks().ById(id)) is Book book)
+        if ((await _dbContext.Books.All.ById(id)) is Book book)
         {
             this.Book = book;
             await this.PopulatePriceSpecification();
@@ -49,7 +51,7 @@ public class BookDetailsModel : PageModel
     private async Task PopulatePriceSpecification()
     {
         this.Discount = this.Discount.Within(new DiscountContext(this.Book));
-        Money? originalPrice = (await _dbContext.BookPrices.For(this.Book).At(DateTime.Now).FirstOrDefaultAsync())?.Price;
+        Money? originalPrice = (await _dbContext.BookPrices.All.For(this.Book).At(DateTime.Now).FirstOrDefaultAsync())?.Price;
         this.PriceSpecification = originalPrice.HasValue ? this.CalculatePriceLines(originalPrice.Value) : new List<PriceLine>();
     }
 
@@ -57,7 +59,7 @@ public class BookDetailsModel : PageModel
     {
         string[] words = this.Book.Title.SplitIntoWords().Where(word => word.Length > 3).ToArray();
         _logger.LogInformation("Title: {title}; words: {words}", this.Book.Title, string.Join(", ", words));
-        var candidateBooks = await _dbContext.Books.GetBooks().ToListAsync();
+        var candidateBooks = await _dbContext.Books.All.ToListAsync();
 
         this.RecommendedBooks = candidateBooks
             .Select(book => (book, score: this.GetRecommendationScore(book, words)))

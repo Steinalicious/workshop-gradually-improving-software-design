@@ -1,20 +1,23 @@
+using Bookstore.Data;
+using Bookstore.Data.Implementation;
 using Bookstore.Domain.Common;
 using Bookstore.Domain.Invoices;
 using Bookstore.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 
-public class BookstoreDbContext : DbContext
+
+public class BookstoreDbContext : DbContext, IUnitOfWork
 {
     public BookstoreDbContext(DbContextOptions<BookstoreDbContext> options)
         : base(options)
     {
     }
 
-    public DbSet<Book> Books => base.Set<Book>();
+    public DbSet<Book> BooksDbSet => base.Set<Book>();
     public DbSet<BookAuthor> BookAuthors => base.Set<BookAuthor>();
 
-    public DbSet<BookPrice> BookPrices => base.Set<BookPrice>();
+    public DbSet<BookPrice> BookPricesDbSet => base.Set<BookPrice>();
 
     public DbSet<Customer> Customers => base.Set<Customer>();
 
@@ -22,6 +25,14 @@ public class BookstoreDbContext : DbContext
 
     public DbSet<InvoiceRecord> Invoices => base.Set<InvoiceRecord>();
     public DbSet<InvoiceLine> InvoiceLines => base.Set<InvoiceLine>();
+
+    public IRepository<Book> Books => new DbSetRepository<Book>(
+        BooksDbSet,
+        BooksDbSet.Include(book => book.AuthorsCollection).ThenInclude(bookAuthor => bookAuthor.Person));
+
+    public IRepository<BookPrice> BookPrices => new DbSetRepository<BookPrice>(BookPricesDbSet, BookPricesDbSet);
+
+    public void Commit() => this.SaveChanges();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -43,12 +54,16 @@ public class BookstoreDbContext : DbContext
             .HasOne(bookAuthor => bookAuthor.Person)
             .WithMany();
 
+        modelBuilder.Entity<Book>().ToTable("Books");
+
         modelBuilder.Entity<Book>()
             .Property(book => book.Id)
             .ValueGeneratedOnAdd();
 
         modelBuilder.Entity<Book>()
             .Ignore(book => book.Authors);
+
+        modelBuilder.Entity<BookPrice>().ToTable("BookPrices");
 
         modelBuilder.Entity<BookPrice>()
             .HasOne<Book>()

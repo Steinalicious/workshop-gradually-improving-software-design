@@ -5,6 +5,7 @@ using Bookstore.Domain.Discounts;
 using Bookstore.Domain.Discounts.Implementation;
 using Microsoft.EntityFrameworkCore;
 using Bookstore.Domain.Invoices;
+using Bookstore.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,8 @@ string bookstoreConnectionString =
     builder.Configuration.GetConnectionString("BookstoreConnection") ?? string.Empty;
 builder.Services.AddDbContext<BookstoreDbContext>(options =>
     options.UseSqlServer(bookstoreConnectionString));
+
+builder.Services.AddScoped<IUnitOfWork, BookstoreDbContext>();
 
 builder.Services.AddScoped<InvoiceFactory>(_ => new InvoiceFactory(
     DateOnly.FromDateTime(DateTime.UtcNow),
