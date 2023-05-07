@@ -48,7 +48,7 @@
             <th>Total amount</th>
         </thead>
         <tbody>
-            @foreach (var notification in Model.DelinquentCustomers.OrderBy(notification => notification.IssuedTo))
+            @foreach (var notification in Model.DelinquentCustomers)
             {
                 <tr>
                     <td>@notification.Ordinal</td>

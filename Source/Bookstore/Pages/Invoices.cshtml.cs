@@ -55,21 +55,21 @@ public class InvoicesModel : PageModel
             .ToListAsync();
         var invoices = _invoiceFactory.ToModels(records);
 
-        this.Invoices = invoices.Select((record, index) => ToRow(index + 1, record)).ToList();
+        this.Invoices = invoices.OrderBy(invoice => invoice.IssueDate).Select((record, index) => ToRow(index + 1, record)).ToList();
     }
 
     private async Task PopulateDelinquentCustomers() => 
         this.DelinquentCustomers = (await GetDelinquentCustomers())
             .GetNotifications()
+            .OrderBy(notification => notification.Customer.Label)
             .Select((notification, index) => new DelinquentRow(index + 1, notification.Customer.Label, notification.Amount))
             .ToList();
 
-    private static InvoiceRow ToRow(int ordinal, Invoice invoice) =>
-        new InvoiceRow(
-            invoice.Id, ordinal, invoice.Label,
-            invoice.IssueDate.ToString("MM/dd/yyyy"),
-            $"{invoice.Status.prefix} {invoice.Status.date}",
-            invoice.Total, ToStyle(invoice), invoice is UnpaidInvoice);
+    private static InvoiceRow ToRow(int ordinal, Invoice invoice) => new(
+        invoice.Id, ordinal, invoice.Label,
+        invoice.IssueDate.ToString("MM/dd/yyyy"),
+        $"{invoice.Status.prefix} {invoice.Status.date}",
+        invoice.Total, ToStyle(invoice), invoice is UnpaidInvoice);
 
     private static string ToStyle(Invoice invoice) =>
         invoice.GetType().Name.Replace("Invoice", "").ToLower();
