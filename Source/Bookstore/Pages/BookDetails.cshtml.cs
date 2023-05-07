@@ -35,7 +35,7 @@ public class BookDetailsModel : PageModel
     public async Task<IActionResult> OnGet(Guid id)
     {
         await _bookPricesSeed.SeedAsync();
-        if ((await _dbContext.Books.GetBooks().ById(id)) is Book book)
+        if ((await _dbContext.Books.Include(book => book.AuthorsCollection).ThenInclude(bookAuthor => bookAuthor.Person).FirstOrDefaultAsync(book => book.Id == id)) is Book book)
         {
             this.Book = book;
             await this.PopulatePriceSpecification();
@@ -57,7 +57,7 @@ public class BookDetailsModel : PageModel
     {
         string[] words = this.Book.Title.SplitIntoWords().Where(word => word.Length > 3).ToArray();
         _logger.LogInformation("Title: {title}; words: {words}", this.Book.Title, string.Join(", ", words));
-        var candidateBooks = await _dbContext.Books.GetBooks().ToListAsync();
+        var candidateBooks = await _dbContext.Books.Include(book => book.AuthorsCollection).ThenInclude(bookAuthor => bookAuthor.Person).ToListAsync();
 
         this.RecommendedBooks = candidateBooks
             .Select(book => (book, score: this.GetRecommendationScore(book, words)))

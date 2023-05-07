@@ -1,5 +1,6 @@
 using Bookstore.Domain.Models;
 using Bookstore.Domain.Specifications;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Data.Seeding.DataSeed;
 
@@ -31,7 +32,7 @@ public class BooksSeed : IDataSeed<Book>
 
     public async Task<Book> EnsureEqualExists(Book entity)
     {
-        if (_dbContext.Books.GetBooks().ByTitle(entity.Title).FirstOrDefault() is Book book)
+        if (_dbContext.Books.Include(book => book.AuthorsCollection).ThenInclude(bookAuthor => bookAuthor.Person).Where(book => book.Title == entity.Title).FirstOrDefault() is Book book)
         {
             return book;
         }

@@ -37,9 +37,13 @@ public class BooksModel : PageModel
             .OrderBy(initial => initial)
             .ToListAsync();
 
-    private async Task PopulateBooks(string? authorInitial) =>
-        this.Books = await _dbContext.Books.GetBooks()
-            .ByOptionalAuthorInitial(authorInitial)
-            .OrderBy(book => book.Title)
-            .ToListAsync();
+    private async Task PopulateBooks(string? authorInitial)
+    {
+        IQueryable<Book> allBooks = _dbContext.Books.Include(book => book.AuthorsCollection).ThenInclude(bookAuthor => bookAuthor.Person);
+
+        IQueryable<Book> books = authorInitial is null ? allBooks
+        : allBooks.Where(book => book.AuthorsCollection.Any(author => author.Person.LastName.StartsWith(authorInitial)));
+
+        this.Books = await books.OrderBy(book => book.Title).ToListAsync();
+    }
 }

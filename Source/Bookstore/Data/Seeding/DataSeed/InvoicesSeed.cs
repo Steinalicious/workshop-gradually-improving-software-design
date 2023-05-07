@@ -57,7 +57,7 @@ public class InvoicesSeed : IDataSeed<InvoiceRecord>
 
     private async Task<IEnumerable<(Book book, Money price)>> LoadBookPricesAsync() =>
         (await this._context.Books
-            .GetBooks()
+            .Include(book => book.AuthorsCollection).ThenInclude(bookAuthor => bookAuthor.Person)
             .Join(this._context.BookPrices, b => b.Id, bp => bp.BookId, (b, bp) => new { Book = b, Price = bp.Price })
             .OrderBy(row => row.Book.Title)
             .ToListAsync())
