@@ -36,7 +36,6 @@ public class BookDetailsModel : PageModel
         await _bookPricesSeed.SeedAsync();
         if ((await _dbContext.Books.GetBooks().ById(id)) is Book book)
         {
-            
             this.Book = book;
             this.Discount = this.Discount.Within(new DiscountContext(book));
 
