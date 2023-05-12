@@ -16,10 +16,10 @@ public class BooksModel : PageModel
     public IEnumerable<Book> Books { get; private set; } = Enumerable.Empty<Book>();
     public IReadOnlyList<string> PublishedAuthorInitials { get; private set; } = Array.Empty<string>();
     private readonly IDataSeed<Book> _booksSeed;
-    private readonly ISpecification<Book> _spec;
+    private readonly ISpecification<Book> _allBooksSpec;
 
     public BooksModel(ILogger<IndexModel> logger, IUnitOfWork dbContext, IDataSeed<Book> booksSeed, ISpecification<Book> spec) =>
-        (_logger, _dbContext, _booksSeed, _spec) = (logger, dbContext, booksSeed, spec);
+        (_logger, _dbContext, _booksSeed, _allBooksSpec) = (logger, dbContext, booksSeed, spec);
 
     public async Task OnGet([FromQuery] string? initial)
     {
@@ -38,7 +38,7 @@ public class BooksModel : PageModel
 
     private async Task PopulateBooks(string? authorInitial)
     {
-        ISpecification<Book> spec = authorInitial is null ? _spec : _spec.ByAuthorInitial(authorInitial);
+        ISpecification<Book> spec = authorInitial is null ? _allBooksSpec : _allBooksSpec.ByAuthorInitial(authorInitial);
         this.Books = await _dbContext.Books.QueryAsync(spec.OrderByTitle());
     }
 }
