@@ -28,9 +28,9 @@
             {
                 <tr>
                     <td>@ordinal</td>
-                    <td style="text-align: left">@string.Join(", ", book.Authors.Select(person => $"{person.FirstName} {person.LastName}"))</td>
-                    <td style="text-align: left">@book.Title</td>
-                    <td><a class="btn btn-primary" href="/book/@book.Id">View</a></td>
+                    <td style="text-align: left">@book.authors</td>
+                    <td style="text-align: left">@book.title</td>
+                    <td><a class="btn btn-primary" href="/book/@book.id">View</a></td>
                 </tr>
             }
     </table>

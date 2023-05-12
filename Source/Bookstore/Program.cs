@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Bookstore.Domain.Invoices;
 using Bookstore.Data;
 using Bookstore.Data.Implementation;
+using Bookstore.Domain.Models.BibliographicFormatters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,6 +32,9 @@ builder.Services.AddScoped<InvoiceFactory>(_ => new InvoiceFactory(
 
 builder.Services.AddSingleton<IDiscount>(_ =>
     (new RelativeDiscount(0.15M).Then(new TitlePrefixDiscount(.10M, "C"))).And(new TitleContentDiscount(.25M, "Code")).CapTo(.30M));
+
+builder.Services.AddSingleton<IAuthorListFormatter>(_ => new SeparatedAuthorsFormatter(new ShortNameFormatter(), ", ", " and "));
+builder.Services.AddSingleton<IBibliographicEntryFormatter>(_ => TitleAndAuthorsFormatter.Academic());
 
 if (builder.Environment.IsDevelopment())
 {

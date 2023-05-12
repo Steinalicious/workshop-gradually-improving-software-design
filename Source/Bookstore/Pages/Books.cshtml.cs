@@ -13,13 +13,14 @@ public class BooksModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
     private readonly IUnitOfWork _dbContext;
-    public IEnumerable<Book> Books { get; private set; } = Enumerable.Empty<Book>();
+    public IEnumerable<(Guid id, string authors, string title)> Books { get; private set; } = Enumerable.Empty<(Guid, string, string)>();
     public IReadOnlyList<string> PublishedAuthorInitials { get; private set; } = Array.Empty<string>();
     private readonly IDataSeed<Book> _booksSeed;
     private readonly ISpecification<Book> _spec;
+    private readonly IAuthorListFormatter _authorListFormatter;
 
-    public BooksModel(ILogger<IndexModel> logger, IUnitOfWork dbContext, IDataSeed<Book> booksSeed, ISpecification<Book> spec) =>
-        (_logger, _dbContext, _booksSeed, _spec) = (logger, dbContext, booksSeed, spec);
+    public BooksModel(ILogger<IndexModel> logger, IUnitOfWork dbContext, IDataSeed<Book> booksSeed, ISpecification<Book> spec, IAuthorListFormatter authorListFormatter) =>
+        (_logger, _dbContext, _booksSeed, _spec, _authorListFormatter) = (logger, dbContext, booksSeed, spec, authorListFormatter);
 
     public async Task OnGet([FromQuery] string? initial)
     {
@@ -39,6 +40,7 @@ public class BooksModel : PageModel
     private async Task PopulateBooks(string? authorInitial)
     {
         ISpecification<Book> spec = authorInitial is null ? _spec : _spec.ByAuthorInitial(authorInitial);
-        this.Books = await _dbContext.Books.QueryAsync(spec.OrderByTitle());
+        this.Books = (await _dbContext.Books.QueryAsync(spec.OrderByTitle()))
+            .Select(book => (book.Id, _authorListFormatter.Format(book.Authors), book.Title));
     }
 }

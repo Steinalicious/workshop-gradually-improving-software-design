@@ -18,22 +18,24 @@ public class BookDetailsModel : PageModel
     private readonly ILogger<IndexModel> _logger;
     private readonly IUnitOfWork _dbContext;
     private readonly IDataSeed<BookPrice> _bookPricesSeed;
-    private readonly ISpecification<Book> _spec;
+    private readonly ISpecification<Book> _allBooksSpec;
+    private readonly IBibliographicEntryFormatter _recommendedBooksFormatter;
     private IDiscount Discount { get; set; }
 
     public Book Book { get; private set; } = null!;
 
     public IReadOnlyList<PriceLine> PriceSpecification { get; private set; } = Array.Empty<PriceLine>();
-    public IReadOnlyList<Book> RecommendedBooks { get; private set; } = Array.Empty<Book>();
+    public IReadOnlyList<(string book, Guid id)> RecommendedBooks { get; private set; } = Array.Empty<(string, Guid)>();
 
     public BookDetailsModel(ILogger<IndexModel> logger, IUnitOfWork dbContext, IDataSeed<BookPrice> bookPricesSeed,
-                            IDiscount discount, ISpecification<Book> spec) =>
-        (_logger, _dbContext, _bookPricesSeed, Discount, _spec) = (logger, dbContext, bookPricesSeed, discount, spec);
+                            IDiscount discount, ISpecification<Book> spec, IBibliographicEntryFormatter recommendedBooksFormatter) =>
+        (_logger, _dbContext, _bookPricesSeed, Discount, _allBooksSpec, _recommendedBooksFormatter) =
+        (logger, dbContext, bookPricesSeed, discount, spec, recommendedBooksFormatter);
 
     public async Task<IActionResult> OnGet(Guid id)
     {
         await _bookPricesSeed.SeedAsync();
-        if ((await _dbContext.Books.SingleOrDefaultAsync(_spec.ById(id))) is Book book)
+        if ((await _dbContext.Books.SingleOrDefaultAsync(_allBooksSpec.ById(id))) is Book book)
         {
             this.Book = book;
             await this.PopulatePriceSpecification();
@@ -63,11 +65,12 @@ public class BookDetailsModel : PageModel
             .OrderByDescending(bookScore => bookScore.score)
             .Take(3)
             .Select(bookScore => bookScore.book)
+            .Select(book => (this._recommendedBooksFormatter.Format(book), book.Id))
             .ToList();
 
         foreach (var recommended in this.RecommendedBooks)
         {
-            _logger.LogInformation("Recommended: {title}", recommended.Title);
+            _logger.LogInformation("Recommended: {title}", recommended.book);
         }
     }
 
