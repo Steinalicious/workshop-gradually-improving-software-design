@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Bookstore.Data;
+using Bookstore.Data.Specifications;
 
 namespace Bookstore.Pages;
 
@@ -17,6 +18,7 @@ public class BookDetailsModel : PageModel
     private readonly ILogger<IndexModel> _logger;
     private readonly IUnitOfWork _dbContext;
     private readonly IDataSeed<BookPrice> _bookPricesSeed;
+    private readonly ISpecification<Book> _spec;
     private IDiscount Discount { get; set; }
 
     public Book Book { get; private set; } = null!;
@@ -25,19 +27,13 @@ public class BookDetailsModel : PageModel
     public IReadOnlyList<Book> RecommendedBooks { get; private set; } = Array.Empty<Book>();
 
     public BookDetailsModel(ILogger<IndexModel> logger, IUnitOfWork dbContext, IDataSeed<BookPrice> bookPricesSeed,
-                            IDiscount discount, IDataSeed<BookPrice> bookPricesSeed2)
-    {
-        _logger = logger;
-        _dbContext = dbContext;
-        _bookPricesSeed = bookPricesSeed;
-        Discount = discount;
-        _bookPricesSeed = bookPricesSeed2;
-    }
+                            IDiscount discount, ISpecification<Book> spec) =>
+        (_logger, _dbContext, _bookPricesSeed, Discount, _spec) = (logger, dbContext, bookPricesSeed, discount, spec);
 
     public async Task<IActionResult> OnGet(Guid id)
     {
         await _bookPricesSeed.SeedAsync();
-        if ((await _dbContext.Books.All.FirstOrDefaultAsync(book => book.Id == id)) is Book book)
+        if ((await _dbContext.Books.SingleOrDefaultAsync(_spec.ById(id))) is Book book)
         {
             this.Book = book;
             await this.PopulatePriceSpecification();

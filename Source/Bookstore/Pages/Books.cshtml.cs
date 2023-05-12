@@ -1,5 +1,6 @@
 ﻿using Bookstore.Data;
 using Bookstore.Data.Seeding;
+using Bookstore.Data.Specifications;
 using Bookstore.Domain.Models;
 using Bookstore.Domain.Specifications;
 using Microsoft.AspNetCore.Mvc;
@@ -15,13 +16,10 @@ public class BooksModel : PageModel
     public IEnumerable<Book> Books { get; private set; } = Enumerable.Empty<Book>();
     public IReadOnlyList<string> PublishedAuthorInitials { get; private set; } = Array.Empty<string>();
     private readonly IDataSeed<Book> _booksSeed;
+    private readonly ISpecification<Book> _spec;
 
-    public BooksModel(ILogger<IndexModel> logger, IUnitOfWork dbContext, IDataSeed<Book> booksSeed)
-    {
-        _logger = logger;
-        _dbContext = dbContext;
-        _booksSeed = booksSeed;
-    }
+    public BooksModel(ILogger<IndexModel> logger, IUnitOfWork dbContext, IDataSeed<Book> booksSeed, ISpecification<Book> spec) =>
+        (_logger, _dbContext, _booksSeed, _spec) = (logger, dbContext, booksSeed, spec);
 
     public async Task OnGet([FromQuery] string? initial)
     {
@@ -40,11 +38,7 @@ public class BooksModel : PageModel
 
     private async Task PopulateBooks(string? authorInitial)
     {
-        IQueryable<Book> allBooks = _dbContext.Books.All;
-
-        IQueryable<Book> books = authorInitial is null ? allBooks
-        : allBooks.Where(book => book.AuthorsCollection.Any(author => author.Person.LastName.StartsWith(authorInitial)));
-
-        this.Books = await books.OrderBy(book => book.Title).ToListAsync();
+        ISpecification<Book> spec = authorInitial is null ? _spec : _spec.ByAuthorInitial(authorInitial);
+        this.Books = await _dbContext.Books.QueryAsync(spec.OrderByTitle());
     }
 }
