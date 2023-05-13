@@ -1,4 +1,5 @@
 ﻿@page "{initial?}"
+@using Bookstore.Domain.Models
 @model BooksModel
 @{
     ViewData["Title"] = "Home page";
@@ -28,8 +29,15 @@
             {
                 <tr>
                     <td>@ordinal</td>
-                    <td style="text-align: left">@book.authors</td>
-                    <td style="text-align: left">@book.title</td>
+                    <td style="text-align: left">@foreach (CitationSegment segment in @book.authors)
+                        {<span class="citation-@segment.GetType().Name.ToLower()">@segment.Text</span>}
+                    </td>
+                    <td style="text-align: left">
+                        @foreach (CitationSegment segment in @book.title)
+                        {
+                            <span class="citation-@segment.GetType().Name.ToLower()">@segment.Text</span>
+                        }
+                    </td>
                     <td><a class="btn btn-primary" href="/book/@book.id">View</a></td>
                 </tr>
             }

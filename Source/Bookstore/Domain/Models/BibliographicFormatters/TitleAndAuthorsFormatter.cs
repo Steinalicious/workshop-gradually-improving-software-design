@@ -21,7 +21,9 @@ public class TitleAndAuthorsFormatter : IBibliographicEntryFormatter
 
     public Citation ToCitation(Book book)
     {
-        (Citation a, Citation b) = _joinStrategy(Citation.Empty.Add(book.Title), _authorListFormatter.ToCitation(book.Authors));
+        Citation title = new BookTitleSegment(book.Title, book.Id);
+        Citation authors = _authorListFormatter.ToCitation(book.Authors);
+        (Citation a, Citation b) = _joinStrategy(title, authors);
         if (a.IsEmpty) return b;
         if (b.IsEmpty) return a;
         return a.Add(_separator).Add(b);

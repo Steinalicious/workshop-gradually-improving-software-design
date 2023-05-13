@@ -1,4 +1,5 @@
 ﻿@page "/book/{id}"
+@using Bookstore.Domain.Models
 @using Bookstore.Domain.Common;
 
 @model BookDetailsModel
@@ -58,10 +59,13 @@
                 <th scope="col" colspan="2" style="text-align: left">See Also:</th>
             </thead>
             <tbody>
-                @foreach (var book in Model.RecommendedBooks)
+                @foreach (var row in Model.RecommendedBooks)
                 {
                     <tr>
-                        <td style="text-align: left"><a href="/book/@book.id">@book.book</a></td>
+                        <td style="text-align: left"><a class="citation" href="/book/@row.id">
+                            @foreach (CitationSegment segment in row.book)
+                            {<span class="citation-@segment.GetType().Name.ToLower()">@segment.Text</span>}
+                        </a></td>
                     </tr>
                 }
             </tbody>

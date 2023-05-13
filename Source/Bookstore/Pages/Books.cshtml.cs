@@ -2,6 +2,7 @@
 using Bookstore.Data.Seeding;
 using Bookstore.Data.Specifications;
 using Bookstore.Domain.Models;
+using Bookstore.Domain.Models.BibliographicFormatters;
 using Bookstore.Domain.Specifications;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -13,7 +14,7 @@ public class BooksModel : PageModel
 {
     private readonly ILogger<IndexModel> _logger;
     private readonly IUnitOfWork _dbContext;
-    public IEnumerable<(Guid id, string authors, string title)> Books { get; private set; } = Enumerable.Empty<(Guid, string, string)>();
+    public IEnumerable<(Guid id, Citation authors, Citation title)> Books { get; private set; } = Enumerable.Empty<(Guid, Citation, Citation)>();
     public IReadOnlyList<string> PublishedAuthorInitials { get; private set; } = Array.Empty<string>();
     private readonly IDataSeed<Book> _booksSeed;
     private readonly ISpecification<Book> _spec;
@@ -40,7 +41,8 @@ public class BooksModel : PageModel
     private async Task PopulateBooks(string? authorInitial)
     {
         ISpecification<Book> spec = authorInitial is null ? _spec : _spec.ByAuthorInitial(authorInitial);
+        IBibliographicEntryFormatter bookFormatter = new TitleOnlyFormatter();
         this.Books = (await _dbContext.Books.QueryAsync(spec.OrderByTitle()))
-            .Select(book => (book.Id, _authorListFormatter.ToCitation(book.Authors).Text, book.Title));
+            .Select(book => (book.Id, _authorListFormatter.ToCitation(book.Authors), bookFormatter.ToCitation(book)));
     }
 }

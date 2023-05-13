@@ -1,8 +1,9 @@
+using System.Collections;
 using System.Collections.Immutable;
 
 namespace Bookstore.Domain.Models;
 
-public class Citation
+public class Citation : IEnumerable<CitationSegment>
 {
     public string Text => string.Concat(Segments.Select(s => s.Text));
     public bool IsEmpty => Segments.IsEmpty;
@@ -29,6 +30,10 @@ public class Citation
 
         return result;
     }
+
+    public IEnumerator<CitationSegment> GetEnumerator() => Segments.GetEnumerator();
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
     public static implicit operator Citation(CitationSegment segment) => Empty.Add(segment);
 }
