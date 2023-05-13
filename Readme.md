@@ -4,7 +4,7 @@ In this lesson, we will develop a fairly complex feature in a Web application wh
 
 By the end of the exercise, you will learn how to leverage polymorphism to avoid explicit branching, and such tools as LINQ or Composite pattern to remove looping from the domain-related code.
 
-### Preparing the Code
+## Preparing the Code
 
 To run this lesson, checkout the branch named `lesson-branching-and-looping`:
 

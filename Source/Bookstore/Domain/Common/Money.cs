@@ -15,7 +15,7 @@ public readonly record struct Money : IComparable<Money>
         Currency = currency;
     }
 
-    public bool IsZero => Amount == 0;
+    public bool IsZero => Amount == 0 && Currency == Currency.Empty;
 
     public Money Add(Money other) =>
         this.IsZero ? other
