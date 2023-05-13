@@ -2,5 +2,5 @@ namespace Bookstore.Domain.Models;
 
 public interface IBibliographicEntryFormatter
 {
-    string Format(Book book);
+    Citation ToCitation(Book book);
 }

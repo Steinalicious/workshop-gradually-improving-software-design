@@ -4,7 +4,7 @@ public class TitleAndAuthorsFormatter : IBibliographicEntryFormatter
 {
     private readonly IAuthorListFormatter _authorListFormatter;
     private readonly string _separator;
-    private delegate (string a, string b) JoinStrategy(string title, string authors);
+    private delegate (Citation a, Citation b) JoinStrategy(Citation title, Citation authors);
     private readonly JoinStrategy _joinStrategy;
 
     private TitleAndAuthorsFormatter(IAuthorListFormatter authorListFormatter, JoinStrategy joinStrategy, string separator = ", ") =>
@@ -19,11 +19,11 @@ public class TitleAndAuthorsFormatter : IBibliographicEntryFormatter
     public static IBibliographicEntryFormatter Academic() =>
         AuthorsThenTitle(new AcademicAuthorListFormatter(), ", ");
 
-    public string Format(Book book)
+    public Citation ToCitation(Book book)
     {
-        (string a, string b) = _joinStrategy(book.Title, _authorListFormatter.Format(book.Authors));
-        if (string.IsNullOrEmpty(a)) return b;
-        if (string.IsNullOrEmpty(b)) return a;
-        return $"{a}{_separator}{b}";
+        (Citation a, Citation b) = _joinStrategy(Citation.Empty.Add(book.Title), _authorListFormatter.ToCitation(book.Authors));
+        if (a.IsEmpty) return b;
+        if (b.IsEmpty) return a;
+        return a.Add(_separator).Add(b);
     }
 }

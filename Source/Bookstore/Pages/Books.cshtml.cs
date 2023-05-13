@@ -41,6 +41,6 @@ public class BooksModel : PageModel
     {
         ISpecification<Book> spec = authorInitial is null ? _spec : _spec.ByAuthorInitial(authorInitial);
         this.Books = (await _dbContext.Books.QueryAsync(spec.OrderByTitle()))
-            .Select(book => (book.Id, _authorListFormatter.Format(book.Authors), book.Title));
+            .Select(book => (book.Id, _authorListFormatter.ToCitation(book.Authors).Text, book.Title));
     }
 }

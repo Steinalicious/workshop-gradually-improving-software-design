@@ -2,5 +2,6 @@ namespace Bookstore.Domain.Models.BibliographicFormatters;
 
 public class ShortNameFormatter : IAuthorNameFormatter
 {
-    public string Format(Person author) => $"{author.FirstName.Substring(0, 1)}. {author.LastName}";
+    public Citation ToCitation(Person author) =>
+        new BookAuthorSegment($"{author.FirstName[..1]}. {author.LastName}", author.Id);
 }

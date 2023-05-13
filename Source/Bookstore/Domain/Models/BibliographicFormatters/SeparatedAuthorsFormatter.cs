@@ -9,17 +9,14 @@ public class SeparatedAuthorsFormatter : IAuthorListFormatter
     public SeparatedAuthorsFormatter(IAuthorNameFormatter singleAuthorFormatter, string separator = ", ", string lastSeparator = " and ") =>
         (_authorNameFormatter, _separator, _lastSeparator) = (singleAuthorFormatter, separator, lastSeparator);
 
-    public string Format(IEnumerable<Person> authors) =>
-        _separator == _lastSeparator ? FormatUniform(authors) : FormatWithLast(authors.ToArray());
+    public Citation ToCitation(IEnumerable<Person> authors) =>
+        FormatToSegments(authors.Select(_authorNameFormatter.ToCitation).ToArray());
 
-    private string FormatUniform(IEnumerable<Person> authors) =>
-        string.Join(_separator, authors.Select(_authorNameFormatter.Format));
-
-    private string FormatWithLast(Person[] authors)
+    private Citation FormatToSegments(Citation[] authors) => authors switch
     {
-        if (authors.Length < 2) return FormatUniform(authors);
-        var lastAuthor = authors[^1];
-        IEnumerable<Person> otherAuthors = authors[..^1];
-        return FormatUniform(otherAuthors) + _lastSeparator + _authorNameFormatter.Format(lastAuthor);
-    }
+        [] => Citation.Empty,
+        [var author] => author,
+        [var author1, var author2] => author1.Add(_lastSeparator).Add(author2),
+        [.. var first, var last] => Citation.Join(_separator, first).Add(_lastSeparator).Add(last)
+    };
 }

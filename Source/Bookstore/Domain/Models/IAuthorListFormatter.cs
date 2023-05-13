@@ -2,5 +2,5 @@ namespace Bookstore.Domain.Models;
 
 public interface IAuthorListFormatter
 {
-    string Format(IEnumerable<Person> authors);
+    Citation ToCitation(IEnumerable<Person> authors);
 }

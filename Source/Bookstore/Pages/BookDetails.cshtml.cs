@@ -65,7 +65,7 @@ public class BookDetailsModel : PageModel
             .OrderByDescending(bookScore => bookScore.score)
             .Take(3)
             .Select(bookScore => bookScore.book)
-            .Select(book => (this._recommendedBooksFormatter.Format(book), book.Id))
+            .Select(book => (this._recommendedBooksFormatter.ToCitation(book).Text, book.Id))
             .ToList();
 
         foreach (var recommended in this.RecommendedBooks)
