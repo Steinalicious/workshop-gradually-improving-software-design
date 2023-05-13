@@ -14,8 +14,8 @@ public abstract class InvoiceLine
         private set => (this.Amount, this.Currency) = (value.Amount, value.Currency);
     }
 
-    private decimal Amount { get; set; } = 0;       // Used by EF Core
-    private Currency Currency { get; set; }         // Used by EF Core
+    private decimal Amount { get; set; } = 0;                       // Used by EF Core
+    private Currency Currency { get; set; } = Currency.Empty;       // Used by EF Core
 
     protected InvoiceLine() { }      // Used by EF Core
 

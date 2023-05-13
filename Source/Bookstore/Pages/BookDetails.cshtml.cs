@@ -50,7 +50,7 @@ public class BookDetailsModel : PageModel
     {
         this.Discount = this.Discount.Within(new DiscountContext(this.Book));
         Money? originalPrice = (await _dbContext.BookPrices.All.For(this.Book).At(DateTime.Now).FirstOrDefaultAsync())?.Price;
-        this.PriceSpecification = originalPrice.HasValue ? this.CalculatePriceLines(originalPrice.Value) : new List<PriceLine>();
+        this.PriceSpecification = originalPrice is not null ? this.CalculatePriceLines(originalPrice) : new List<PriceLine>();
     }
 
     private async Task PopulateRecommendedBooks()
@@ -68,9 +68,9 @@ public class BookDetailsModel : PageModel
             .Select(book => (this._recommendedBooksFormatter.Format(book), book.Id))
             .ToList();
 
-        foreach (var recommended in this.RecommendedBooks)
+        foreach (var (book, id) in this.RecommendedBooks)
         {
-            _logger.LogInformation("Recommended: {title}", recommended.book);
+            _logger.LogInformation("Recommended: {title}", book);
         }
     }
 
