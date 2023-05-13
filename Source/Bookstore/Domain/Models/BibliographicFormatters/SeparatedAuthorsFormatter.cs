@@ -6,7 +6,7 @@ public class SeparatedAuthorsFormatter : IAuthorListFormatter
     private readonly string _lastSeparator;
     private readonly IAuthorNameFormatter _authorNameFormatter;
 
-    public SeparatedAuthorsFormatter(IAuthorNameFormatter singleAuthorFormatter, string separator = ", ", string lastSeparator = ", ") =>
+    public SeparatedAuthorsFormatter(IAuthorNameFormatter singleAuthorFormatter, string separator = ", ", string lastSeparator = " and ") =>
         (_authorNameFormatter, _separator, _lastSeparator) = (singleAuthorFormatter, separator, lastSeparator);
 
     public string Format(IEnumerable<Person> authors) =>

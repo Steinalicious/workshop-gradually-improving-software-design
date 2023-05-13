@@ -33,7 +33,9 @@ builder.Services.AddScoped<InvoiceFactory>(_ => new InvoiceFactory(
 builder.Services.AddSingleton<IDiscount>(_ =>
     (new RelativeDiscount(0.15M).Then(new TitlePrefixDiscount(.10M, "C"))).And(new TitleContentDiscount(.25M, "Code")).CapTo(.30M));
 
-builder.Services.AddSingleton<IAuthorListFormatter>(_ => new SeparatedAuthorsFormatter(new ShortNameFormatter(), ", ", " and "));
+builder.Services.AddSingleton<IAuthorNameFormatter, FullNameFormatter>();
+builder.Services.AddSingleton<IAuthorListFormatter, SeparatedAuthorsFormatter>();
+// builder.Services.AddSingleton<IBibliographicEntryFormatter, TitleOnlyFormatter>();
 builder.Services.AddSingleton<IBibliographicEntryFormatter>(_ => TitleAndAuthorsFormatter.Academic());
 
 if (builder.Environment.IsDevelopment())
