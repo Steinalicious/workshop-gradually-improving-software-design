@@ -1,4 +1,12 @@
 @using Bookstore.Domain.Models
 @model IEnumerable<CitationSegment>
 @foreach(CitationSegment segment in Model)
-{<span class="citation-@segment.GetType().Name.ToLower()">@segment.Text</span>}
+{
+    string style = "citation-" + @segment.GetType().Name.ToLower();
+    if (segment is BookAuthorSegment author)
+    {<a class="citation" href="/books?authorId=@author.AuthorId" ><span class="@style">@author.Text</span></a>}
+    else if (segment is BookTitleSegment book)
+    {<a class="citation" href="/book/@book.BookId" ><span class="@style">@book.Text</span></a>}
+    else
+    {<span class="@style">@segment.Text</span>}
+}

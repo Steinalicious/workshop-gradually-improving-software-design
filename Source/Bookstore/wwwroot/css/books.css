@@ -1,6 +1,11 @@
 a.citation {
     text-decoration: none;
-    color: #000000;
+    color: darkblue;
+}
+
+a.citation:hover {
+    text-decoration: underline;
+    background-color: lightgray;
 }
 
 span.citation-bookauthorsegment {
@@ -16,4 +21,5 @@ span.citation-booktitlesegment {
 span.citation-textsegment {
     font-style: normal;
     font-weight: normal;
+    color: darkslategray;
 }
