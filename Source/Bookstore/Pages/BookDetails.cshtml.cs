@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Bookstore.Data;
 using Bookstore.Data.Specifications;
+using Bookstore.Common;
 
 namespace Bookstore.Pages;
 
@@ -32,18 +33,17 @@ public class BookDetailsModel : PageModel
         (_logger, _dbContext, _bookPricesSeed, Discount, _allBooksSpec, _recommendedBooksFormatter) =
         (logger, dbContext, bookPricesSeed, discount, spec, recommendedBooksFormatter);
 
-    public async Task<IActionResult> OnGet(Guid id)
-    {
-        await _bookPricesSeed.SeedAsync();
-        if ((await _dbContext.Books.SingleOrDefaultAsync(_allBooksSpec.ById(id))) is Book book)
-        {
-            this.Book = book;
-            await this.PopulatePriceSpecification();
-            await this.PopulateRecommendedBooks();
-            return Page();
-        }
+    public async Task<IActionResult> OnGet(Guid id) => await _dbContext.Books
+        .SingleOrNoneAsync(_allBooksSpec.ById(id))
+        .AuditAsync(Populate)
+        .Map(_ => base.Page() as IActionResult)
+        .Reduce(() => Redirect("/books"));
 
-        return Redirect("/books");
+    private async Task Populate(Book book)
+    {
+        this.Book = book;
+        await this.PopulatePriceSpecification();
+        await this.PopulateRecommendedBooks();
     }
 
     private async Task PopulatePriceSpecification()

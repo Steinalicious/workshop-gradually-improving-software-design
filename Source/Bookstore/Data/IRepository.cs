@@ -1,3 +1,5 @@
+using Bookstore.Common;
+
 namespace Bookstore.Data;
 
 public interface IRepository<TEntity> where TEntity : class
@@ -7,5 +9,5 @@ public interface IRepository<TEntity> where TEntity : class
     void Remove(TEntity entity);
 
     Task<List<TEntity>> QueryAsync(ISpecification<TEntity> specification);
-    Task<TEntity?> SingleOrDefaultAsync(ISpecification<TEntity> specification);
+    Task<Option<TEntity>> SingleOrNoneAsync(ISpecification<TEntity> specification);
 }

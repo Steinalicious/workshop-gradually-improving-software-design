@@ -1,4 +1,5 @@
 using System.Linq.Expressions;
+using Bookstore.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bookstore.Data.Implementation;
@@ -20,8 +21,8 @@ public class DbSetRepository<TEntity> : IRepository<TEntity> where TEntity : cla
     public async Task<List<TEntity>> QueryAsync(ISpecification<TEntity> specification) =>
         await Apply(specification).ToListAsync();
 
-    public async Task<TEntity?> SingleOrDefaultAsync(ISpecification<TEntity> specification) =>
-        await Apply(specification).SingleOrDefaultAsync();
+    public async Task<Option<TEntity>> SingleOrNoneAsync(ISpecification<TEntity> specification) =>
+        (await Apply(specification).SingleOrDefaultAsync()).AsOption();
 
     private IQueryable<TEntity> Apply(ISpecification<TEntity> specification) =>
         specification is QueryableSpecification<TEntity> queryableSpecification ? Apply(queryableSpecification)
