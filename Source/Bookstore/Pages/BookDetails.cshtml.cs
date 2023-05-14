@@ -33,11 +33,19 @@ public class BookDetailsModel : PageModel
         (_logger, _dbContext, _bookPricesSeed, Discount, _allBooksSpec, _recommendedBooksFormatter) =
         (logger, dbContext, bookPricesSeed, discount, spec, recommendedBooksFormatter);
 
-    public async Task<IActionResult> OnGet(Guid id) => await _dbContext.Books
-        .SingleOrNoneAsync(_allBooksSpec.ById(id))
-        .AuditAsync(Populate)
-        .Map(_ => base.Page() as IActionResult)
-        .Reduce(() => Redirect("/books"));
+    public async Task<IActionResult> OnGet(Guid id)
+    {
+        await _bookPricesSeed.SeedAsync();
+        Book? optionalBook = await _dbContext.Books.SingleOrNoneAsync(_allBooksSpec.ById(id));
+        if (optionalBook is Book book)
+        {
+            this.Book = book;
+            await this.PopulatePriceSpecification();
+            await this.PopulateRecommendedBooks();
+            return Page();
+        }
+        return Redirect("/books");
+    }
 
     private async Task Populate(Book book)
     {
