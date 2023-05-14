@@ -1,4 +1,4 @@
-﻿@page "{initial?}"
+﻿@page
 @using Bookstore.Domain.Models
 @model BooksModel
 @{
@@ -22,23 +22,18 @@
             <th scope="col">#</th>
             <th scope="col" style="text-align: left">Author(s)</th>
             <th scope="col" style="text-align: left">Title</th>
-            <th></th>
         </thead>
         <tbody>
             @foreach (var (book, ordinal) in Model.Books.Select((book, index) => (book, index + 1)))
             {
                 <tr>
                     <td>@ordinal</td>
-                    <td style="text-align: left">@foreach (CitationSegment segment in @book.authors)
-                        {<span class="citation-@segment.GetType().Name.ToLower()">@segment.Text</span>}
+                    <td style="text-align: left">
+                        <partial name="_CitationPartial" model="@book.authors" />
                     </td>
                     <td style="text-align: left">
-                        @foreach (CitationSegment segment in @book.title)
-                        {
-                            <span class="citation-@segment.GetType().Name.ToLower()">@segment.Text</span>
-                        }
+                        <partial name="_CitationPartial" model="@book.title" />
                     </td>
-                    <td><a class="btn btn-primary" href="/book/@book.id">View</a></td>
                 </tr>
             }
     </table>

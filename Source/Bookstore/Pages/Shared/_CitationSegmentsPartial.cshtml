@@ -1,0 +1,4 @@
+@using Bookstore.Domain.Models
+@model IEnumerable<CitationSegment>
+@foreach(CitationSegment segment in Model)
+{<span class="citation-@segment.GetType().Name.ToLower()">@segment.Text</span>}

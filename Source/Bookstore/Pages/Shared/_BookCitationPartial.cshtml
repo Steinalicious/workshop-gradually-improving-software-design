@@ -1,0 +1,6 @@
+@model (Guid bookId, Bookstore.Domain.Models.Citation citation)
+@using Bookstore.Domain.Models
+<a class="citation" href="/book/@Model.bookId">
+    @foreach(CitationSegment segment in Model.citation)
+    {<span class="citation-@segment.GetType().Name.ToLower()">@segment.Text</span>}
+</a>

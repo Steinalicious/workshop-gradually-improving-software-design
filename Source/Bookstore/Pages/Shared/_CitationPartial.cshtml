@@ -1,0 +1,7 @@
+@using Bookstore.Domain.Models
+@using Bookstore.Common
+@model Citation
+@(await Model.TryGetBookId()
+    .MapToObjectAsync(bookId => Html.PartialAsync("_BookCitationPartial", (bookId, Model)))
+    .ReduceAsync(() => Html.PartialAsync("_CitationSegmentsPartial", Model)))
+    
