@@ -38,14 +38,6 @@ public class BooksModel : PageModel
             .OrderBy(initial => initial)
             .ToListAsync();
 
-    private async Task PopulateBooks(string? authorInitial)
-    {
-        ISpecification<Book> spec = authorInitial is null ? _spec : _spec.ByAuthorInitial(authorInitial);
-        IBibliographicEntryFormatter bookFormatter = new TitleOnlyFormatter();
-        this.Books = (await _dbContext.Books.QueryAsync(spec.OrderByTitle()))
-            .Select(book => (book.Id, _authorListFormatter.ToCitation(book.Authors), bookFormatter.ToCitation(book)));
-    }
-
     private async Task PopulateBooks(string? authorInitial, Guid? authorId)
     {
         ISpecification<Book> spec = _spec;
