@@ -23,11 +23,11 @@ public class BooksModel : PageModel
     public BooksModel(ILogger<IndexModel> logger, IUnitOfWork dbContext, IDataSeed<Book> booksSeed, ISpecification<Book> spec, IAuthorListFormatter authorListFormatter) =>
         (_logger, _dbContext, _booksSeed, _spec, _authorListFormatter) = (logger, dbContext, booksSeed, spec, authorListFormatter);
 
-    public async Task OnGet([FromQuery] string? initial, [FromQuery] string authorId)
+    public async Task OnGet([FromQuery] string? initial, [FromQuery] string? authorId)
     {
         await this._booksSeed.SeedAsync();
         await this.PopulatePublishedAuthorInitials();
-        await this.PopulateBooks(initial);
+        await this.PopulateBooks(initial, TryParseGuid(authorId));
     }
 
     private async Task PopulatePublishedAuthorInitials() =>
@@ -45,4 +45,18 @@ public class BooksModel : PageModel
         this.Books = (await _dbContext.Books.QueryAsync(spec.OrderByTitle()))
             .Select(book => (book.Id, _authorListFormatter.ToCitation(book.Authors), bookFormatter.ToCitation(book)));
     }
+
+    private async Task PopulateBooks(string? authorInitial, Guid? authorId)
+    {
+        ISpecification<Book> spec = _spec;
+        if (authorInitial is not null) spec = spec.ByAuthorInitial(authorInitial);
+        if (authorId is not null) spec = spec.ByAuthorId(authorId.Value);
+
+        IBibliographicEntryFormatter bookFormatter = new TitleOnlyFormatter();
+        this.Books = (await _dbContext.Books.QueryAsync(spec.OrderByTitle()))
+            .Select(book => (book.Id, _authorListFormatter.ToCitation(book.Authors), bookFormatter.ToCitation(book)));
+    }
+
+    private static Guid? TryParseGuid(string? id) =>
+        Guid.TryParse(id, out Guid result) ? result : null;
 }
