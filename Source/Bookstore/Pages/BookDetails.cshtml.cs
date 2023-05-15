@@ -9,11 +9,15 @@ namespace Bookstore.Pages;
 
 public class BookDetailsModel : PageModel
 {
+    public record PriceLine(string Label, Money Amount);
+
     private readonly ILogger<IndexModel> _logger;
     private readonly BookstoreDbContext _dbContext;
     public Book Book { get; private set; } = null!;
     private RelativeDiscount Discount { get; }
     public BookPrice Price { get; private set; } = null!;
+
+    public IReadOnlyList<PriceLine> PriceSpecification { get; private set; } = Array.Empty<PriceLine>();
 
     public BookDetailsModel(ILogger<IndexModel> logger, BookstoreDbContext dbContext, RelativeDiscount discount)
     {

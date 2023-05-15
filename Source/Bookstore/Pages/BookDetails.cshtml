@@ -33,6 +33,22 @@
                 <th scope="col" style="text-align: right">Price</th>
                 <th scope="col" style="text-align: right">@Model.Price.Value</th>
             </tr>
+            @foreach (var priceLine in Model.PriceSpecification.Take(Model.PriceSpecification.Count - 1))
+            {
+                <tr class="table-warning">
+                    <th scope="col" style="text-align: right; width:1px; white-space:nowrap;">@priceLine.Label</th>
+                    <td style="text-align: left">@priceLine.Amount</td>
+                </tr>
+            }
         </tbody>
+        @if (Model.PriceSpecification.Count > 0)
+        {
+            <tfoot>
+                <tr class="table-primary">
+                    <th scope="col" style="text-align: right; width:1px; white-space:nowrap;">@Model.PriceSpecification[^1].Label</th>
+                    <td style="text-align: left">@Model.PriceSpecification[^1].Amount</td>
+                </tr>
+            </tfoot>
+        }
     </table>
 </div>
