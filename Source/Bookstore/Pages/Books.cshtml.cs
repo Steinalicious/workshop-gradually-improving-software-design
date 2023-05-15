@@ -46,7 +46,7 @@ public class BooksModel : PageModel
 
         IBibliographicEntryFormatter bookFormatter = new TitleOnlyFormatter();
         this.Books = (await _dbContext.Books.QueryAsync(spec.OrderByTitle()))
-            .Select(book => (book.Id, _authorListFormatter.ToCitation(book.Authors), bookFormatter.ToCitation(book)));
+            .ConvertAll(book => (book.Id, _authorListFormatter.ToCitation(book.Authors), bookFormatter.ToCitation(book)));
     }
 
     private static Guid? TryParseGuid(string? id) =>
