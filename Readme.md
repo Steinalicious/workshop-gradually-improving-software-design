@@ -1,6 +1,6 @@
-# Applying the Map-Reduce Principle
+# Using Specifications and Strategies
 
-In this lesson, we will continue developing the Web application, this time putting stress on sequences of objects and the ways we can process them.
+In this lesson, we will refine existing features of the Web application by applying specifications to query the database and strategies to transform and process objects.
 
 ## Preparing the Code
 
