@@ -1,8 +1,6 @@
-# Avoiding Branching and Looping
+# Gradually Improving Software Design
 
-In this lesson, we will develop a fairly complex feature in a Web application which consists of a significant number of branching and looping instructions.
-
-By the end of the exercise, you will learn how to leverage polymorphism to avoid explicit branching, and such tools as LINQ or Composite pattern to remove looping from the domain-related code.
+In each of the lessons, we will develop a set of fairly complex features in a Web application. Follow per-lesson instructions to complete each stage in the workshop.
 
 ## Prerequisites
 
