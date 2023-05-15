@@ -1,8 +1,6 @@
-# Avoiding Branching and Looping
+# Modeling Optional Objects
 
-In this lesson, we will develop a fairly complex feature in a Web application which consists of a significant number of branching and looping instructions.
-
-By the end of the exercise, you will learn how to leverage polymorphism to avoid explicit branching, and such tools as LINQ or Composite pattern to remove looping from the domain-related code.
+In this lesson, we will design a monad which represents an object that may or may not exist. We will use optional objects to simplify the domain models, and then combine them with TPL to model awaitable optional objects that are useful when working with infrastructure and UI.
 
 ## Preparing the Code
 
