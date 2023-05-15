@@ -30,6 +30,6 @@ In this exercise, we will utilize optional objects to develop rich user experien
 
   - In `Books.cshtml.cs`, define the `Books` property to contain `Citation` objects representing both authors and the title of each book.
   - In the `PopulateBooks` method, transform the authors list and the book into `Citation`s to populate the model property.
-  - In the `Books.cshtml` view, use partial view `_CitationPartial` in two places, to render authors and the book's title; This view is already fully operational, and the results will become immediately visible after htis change.
+  - In the `Books.cshtml` view, use partial view `_CitationPartial` in two places, to render authors and the book's title; This view is already fully operational, and the results will become immediately visible after this change.
   - In the `BookDetails.cshtml.cs`, declare the `RecommendedBooks` as a list of `Citation` objects and update the `PopulateRecommendedBooks` method accordingly.
   - In the `BookDetails.cshtml`, use the partial view `_CitationPartial` to render the recommended books.
