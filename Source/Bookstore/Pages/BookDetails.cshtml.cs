@@ -26,7 +26,7 @@ public class BookDetailsModel : PageModel
     public Book Book { get; private set; } = null!;
 
     public IReadOnlyList<PriceLine> PriceSpecification { get; private set; } = Array.Empty<PriceLine>();
-    public IReadOnlyList<(Citation book, Guid id)> RecommendedBooks { get; private set; } = Array.Empty<(Citation, Guid)>();
+    public IReadOnlyList<Citation> RecommendedBooks { get; private set; } = Array.Empty<Citation>();
 
     public BookDetailsModel(ILogger<IndexModel> logger, IUnitOfWork dbContext, IDataSeed<BookPrice> bookPricesSeed,
                             IDiscount discount, ISpecification<Book> spec, IBibliographicEntryFormatter recommendedBooksFormatter) =>
@@ -65,13 +65,8 @@ public class BookDetailsModel : PageModel
             .OrderByDescending(bookScore => bookScore.score)
             .Take(3)
             .Select(bookScore => bookScore.book)
-            .Select(book => (this._recommendedBooksFormatter.ToCitation(book), book.Id))
+            .Select(book => this._recommendedBooksFormatter.ToCitation(book))
             .ToList();
-
-        foreach (var recommended in this.RecommendedBooks)
-        {
-            _logger.LogInformation("Recommended: {title}", recommended.book);
-        }
     }
 
     private int GetRecommendationScore(Book book, string[] targetWords) =>

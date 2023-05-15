@@ -59,11 +59,11 @@
                 <th scope="col" colspan="2" style="text-align: left">See Also:</th>
             </thead>
             <tbody>
-                @foreach (var row in Model.RecommendedBooks)
+                @foreach (var recommended in Model.RecommendedBooks)
                 {
                     <tr>
                         <td style="text-align: left">
-                            <partial name="_CitationPartial" model="row.book" />
+                            <partial name="_CitationPartial" model="@recommended" />
                         </td>
                     </tr>
                 }
