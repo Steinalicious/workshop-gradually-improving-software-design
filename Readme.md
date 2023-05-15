@@ -1,8 +1,6 @@
-# Avoiding Branching and Looping
+# Using Specifications and Strategies
 
-In this lesson, we will develop a fairly complex feature in a Web application which consists of a significant number of branching and looping instructions.
-
-By the end of the exercise, you will learn how to leverage polymorphism to avoid explicit branching, and such tools as LINQ or Composite pattern to remove looping from the domain-related code.
+This is the final state of the application after applying specifications to query the database and strategies to transform the domain objects.
 
 ### Preparing the Code
 
