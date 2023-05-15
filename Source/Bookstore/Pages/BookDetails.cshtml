@@ -1,11 +1,11 @@
-﻿@page "/books/{id}"
+﻿@page "/book/{id}"
 @model BookDetailsModel
 @{
     ViewData["Title"] = "Home page";
 }
 
 <div class="text-center">
-    <table class="table table-striped">
+    <table class="table table-striped" style="width:1px; white-space:nowrap; margin: auto">
         <thead>
             <th scope="col" colspan="2" style="text-align: left">@Model.Book.Title</th>
         </thead>
