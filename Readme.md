@@ -1,8 +1,6 @@
-# Avoiding Branching and Looping
+# Using Value Objects
 
-In this lesson, we will develop a fairly complex feature in a Web application which consists of a significant number of branching and looping instructions.
-
-By the end of the exercise, you will learn how to leverage polymorphism to avoid explicit branching, and such tools as LINQ or Composite pattern to remove looping from the domain-related code.
+This is the final state of the application, with value objects applied in several places to lift off the weight from the domain models and to simplify their implementation.
 
 ## Preparing the Code
 
