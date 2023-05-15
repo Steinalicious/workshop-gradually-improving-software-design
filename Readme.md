@@ -1,8 +1,6 @@
-# Avoiding Branching and Looping
+# Applying the Map-Reduce Principle
 
-In this lesson, we will develop a fairly complex feature in a Web application which consists of a significant number of branching and looping instructions.
-
-By the end of the exercise, you will learn how to leverage polymorphism to avoid explicit branching, and such tools as LINQ or Composite pattern to remove looping from the domain-related code.
+In this lesson, we will continue developing the Web application, this time putting stress on sequences of objects and the ways we can process them.
 
 ## Preparing the Code
 
