@@ -33,3 +33,14 @@ It is advisable to use `watch run` to keep the application running during the wh
 ```
 dotnet watch run --project .\Bookstore\
 ```
+
+## Lessons
+
+This workshop consists of the following lessons:
+
+  - **Understanding emergent objects** - implementing a feature with use of interconnected, cooperating objects.
+  - **Avoiding branching and looping** - implementing a series of features in such way that branching and looping constructs are replaced by polymorphic calls and delegation.
+  - **Applying the map-reduce design** - putting stress on sequences of objects and the ways we can process them.
+  - **Specifications and strategies** - applying specifications to query the database and strategies to transform and process objects.
+  - **Using value objects** - using value objects, records and record structs to simplify the domain code.
+  - **Modeling optional objects** - design a monad which represents an object that may or may not exist.
