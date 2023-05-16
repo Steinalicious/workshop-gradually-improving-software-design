@@ -1,6 +1,5 @@
 using Bookstore.Data.Seeding;
 using Bookstore.Data.Seeding.DataSeed;
-using Bookstore.Domain.Discounts;
 using Bookstore.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
