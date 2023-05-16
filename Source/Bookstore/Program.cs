@@ -25,8 +25,7 @@ else
     builder.Services.AddScoped<IDataSeed<Book>, NoSeed<Book>>();
 }
 
-builder.Services.AddSingleton<RelativeDiscount, RelativeDiscount>(_ =>
-    new RelativeDiscount(builder.Configuration.GetValue<decimal>("Discounts:RelativeDiscount", 0)));
+decimal relativeDiscount = builder.Configuration.GetValue<decimal>("Discounts:RelativeDiscount", 0);
 
 var app = builder.Build();
 

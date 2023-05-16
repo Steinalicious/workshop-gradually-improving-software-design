@@ -14,25 +14,18 @@ public class BookDetailsModel : PageModel
     private readonly ILogger<IndexModel> _logger;
     private readonly BookstoreDbContext _dbContext;
     public Book Book { get; private set; } = null!;
-    private RelativeDiscount Discount { get; }
-    public BookPrice Price { get; private set; } = null!;
 
     public IReadOnlyList<PriceLine> PriceSpecification { get; private set; } = Array.Empty<PriceLine>();
 
-    public BookDetailsModel(ILogger<IndexModel> logger, BookstoreDbContext dbContext, RelativeDiscount discount)
-    {
-        _logger = logger;
-        _dbContext = dbContext;
-        Discount = discount;
-    }
+    public BookDetailsModel(ILogger<IndexModel> logger, BookstoreDbContext dbContext) =>
+        (_logger, _dbContext) = (logger, dbContext);
 
     public async Task<IActionResult> OnGet(Guid id)
     {
-        _logger.LogInformation("Rendering book with {Discount}", Discount);
         if ((await _dbContext.Books.GetBooks().ById(id)) is Book book)
         {
             this.Book = book;
-            this.Price = BookPricing.SeedPriceFor(book, Currency.USD);
+            this.PriceSpecification = new List<PriceLine>() { new("Price", BookPricing.SeedPriceFor(book, Currency.USD).Value) };
             return Page();
         }
 
