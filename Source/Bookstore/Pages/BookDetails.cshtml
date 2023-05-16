@@ -33,7 +33,7 @@
             {
                 <tr class="table-warning">
                     <th scope="col" style="text-align: right; width:1px; white-space:nowrap;">@priceLine.Label</th>
-                    <td style="text-align: left">@priceLine.Amount</td>
+                    <td style="text-align: right">@priceLine.Amount</td>
                 </tr>
             }
         </tbody>
@@ -42,7 +42,7 @@
             <tfoot>
                 <tr class="table-primary">
                     <th scope="col" style="text-align: right; width:1px; white-space:nowrap;">@Model.PriceSpecification[^1].Label</th>
-                    <th style="text-align: left">@Model.PriceSpecification[^1].Amount</th>
+                    <th style="text-align: right">@Model.PriceSpecification[^1].Amount</th>
                 </tr>
             </tfoot>
         }

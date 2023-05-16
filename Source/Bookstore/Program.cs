@@ -1,6 +1,7 @@
 using Bookstore.Data.Seeding;
 using Bookstore.Data.Seeding.DataSeed;
 using Bookstore.Domain.Discounts;
+using Bookstore.Domain.Discounts.Implementation;
 using Bookstore.Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +27,7 @@ else
 }
 
 decimal relativeDiscount = builder.Configuration.GetValue<decimal>("Discounts:RelativeDiscount", 0);
+builder.Services.AddSingleton<IDiscount>(_ => (new RelativeDiscount(relativeDiscount).Then(new TitlePrefixDiscount(.15M, "C"))).CapTo(.20M));
 
 var app = builder.Build();
 
