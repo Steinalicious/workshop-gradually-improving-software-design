@@ -54,13 +54,3 @@ To complete the second stage of the lecture, ensure that the solution satisfies 
   - Add the column to the right of all the data in the table, and place a button with label "Mark as paid" in every row that displays an unpaid invoice (in any state). When this button is pressed, set the invoice's payment time to current time, update it in the database and refresh the table.
 
 Since invoices may be updated during the request execution, and any changes must be tracked by the `DbContext`, one possible solution is to let each `Invoice` object wrap the underlying database record.
-
-## Task 3 - Implementing the looping classes
-
-Start by checking out the `lesson-branching-and-looping-stage1` branch and updating the database schema:
-
-```
-git checkout lesson-branching-and-looping-stage1
-
-dotnet ef database update --project .\Bookstore\
-```
